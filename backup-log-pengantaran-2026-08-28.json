@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "exportedAt": "2026-08-28T11:48:07.997Z",
+  "trips": [
+    {
+      "id": "1787917383877-ckx06",
+      "tanggal": "2026-08-28",
+      "waktu": "13:45",
+      "tujuan": "Mamulya Space, Fibo Coffee",
+      "jumlah": 2,
+      "jarak": 3,
+      "catatan": ""
+    }
+  ],
+  "favs": [
+    {
+      "nama": "Mamulya Space",
+      "jarak": 1.6
+    },
+    {
+      "nama": "Fibo Coffee",
+      "jarak": 1.4
+    }
+  ],
+  "trash": []
+}
