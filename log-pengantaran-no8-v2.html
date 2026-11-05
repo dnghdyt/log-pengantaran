@@ -1,0 +1,2943 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<script>
+  /* Set tema sebelum render pertama, supaya tidak ada kedipan warna salah. */
+  (function(){
+    try{
+      var t = localStorage.getItem('themeNo8') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark':'light');
+      document.documentElement.setAttribute('data-theme', t);
+    }catch(e){}
+  })();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0B1930">
+<meta name="color-scheme" content="light dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Log Pengantaran">
+<meta name="description" content="Pencatatan trip pengantaran, jarak tempuh, dan estimasi reimburse untuk kurir No.8 Coffee Supply.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect width='24' height='24' rx='6' fill='rgb(0,68,158)'/><circle cx='8.5' cy='13' r='3' fill='rgb(184,135,58)'/><circle cx='16' cy='13' r='3' fill='none' stroke='rgb(184,135,58)' stroke-width='2'/></svg>">
+<title>Log Pengantaran — No.8 Coffee Supply</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* ===== Tema No.8 Coffee Supply =====
+       Biru brand (#00449E) sebagai warna utama, aksen kuningan/brass hangat,
+       netral biru-abu sejuk (bukan krem) supaya tetap terasa presisi & premium.
+       Nama variabel di bawah dipakai juga oleh JS (lihat bagian <script>). */
+    --ink:#10203A;
+    --paper:#F3F6FB;
+    --paper-2:#E8EEF7;
+    --surface:#FFFFFF;
+    --brand:#00449E;
+    --brand-2:#002C5C;
+    --brand-text:#00449E;
+    --brand-light:#55647D;
+    --accent:#B8873A;
+    --accent-ink:#8B5F1C;
+    --accent-light:#F2E2B8;
+    --success:#1D7A5F;
+    --success-bg:#E3F3ED;
+    --danger:#BD3B2E;
+    --danger-bg:#FBE9E6;
+    --warning:#8F5518;
+    --warning-bg:#FBEEDF;
+    --line:#D7E0EC;
+    --line-strong:#5C7290;
+    --overlay:rgba(14,26,48,.55);
+
+    --radius:10px;
+    --radius-lg:18px;
+    --radius-xl:24px;
+    --radius-full:999px;
+    --shadow-sm:0 1px 2px rgba(16,30,51,.07),0 1px 1px rgba(16,30,51,.05);
+    --shadow-md:0 10px 26px -8px rgba(16,30,51,.18),0 2px 6px rgba(16,30,51,.08);
+    --shadow-lg:0 24px 56px -16px rgba(16,30,51,.32),0 4px 12px rgba(16,30,51,.12);
+
+    --font-display:'Bricolage Grotesque',ui-sans-serif,system-ui,sans-serif;
+    --font-body:'Manrope',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    --font-mono:'IBM Plex Mono',ui-monospace,"SF Mono",Menlo,monospace;
+
+    --ease:cubic-bezier(.22,.61,.36,1);
+    font-variant-numeric:tabular-nums;
+    color-scheme:light;
+  }
+
+  html[data-theme="dark"]{
+    --ink:#E9EEF8;
+    --paper:#0A1220;
+    --paper-2:#101C30;
+    --surface:#152238;
+    --brand-text:#6FA8FF;
+    --brand-light:#8C9AB4;
+    --accent-ink:#E0B564;
+    --accent-light:#2E260F;
+    --success:#3FAE86;
+    --success-bg:#0F3226;
+    --danger:#E0685A;
+    --danger-bg:#391712;
+    --warning:#E0A45C;
+    --warning-bg:#382712;
+    --line:#223252;
+    --line-strong:#3C5178;
+    --overlay:rgba(3,8,17,.65);
+    color-scheme:dark;
+  }
+
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    background-image:radial-gradient(1200px 520px at 100% -80px, rgba(184,135,58,.09), transparent 60%);
+    background-attachment:fixed;
+    color:var(--ink);
+    font-family:var(--font-body);
+    font-size:16px;
+    line-height:1.5;
+    padding-bottom:56px;
+    -webkit-tap-highlight-color:transparent;
+    min-height:100vh;
+    min-height:100dvh;
+    transition:background-color .25s var(--ease),color .25s var(--ease);
+  }
+  h1,h2,h3{margin:0 0 4px 0;color:var(--brand-text);font-family:var(--font-display);}
+  h1{font-weight:700;}
+  h2{font-weight:700;letter-spacing:-.01em;}
+  a{color:var(--accent-ink);}
+  ::selection{background:var(--accent-light);color:var(--brand-text);}
+
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+    clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+
+  .icon{width:1.05em;height:1.05em;display:inline-block;vertical-align:-.17em;
+    fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none;}
+
+  /* ===== Angka: selalu tabular mono, biar rapi & scannable ===== */
+  .num-mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums;letter-spacing:-.02em;}
+
+  /* ===== Kerangka layout ===== */
+  .shell{width:100%;max-width:1180px;margin:0 auto;padding:0 18px;}
+  .shell-narrow{width:100%;max-width:560px;margin:0 auto;padding:0 18px;}
+
+  /* ===== Header ===== */
+  header.top{
+    position:relative;
+    background:
+      radial-gradient(640px 260px at 12% -40%, rgba(255,255,255,.10), transparent 60%),
+      linear-gradient(160deg, var(--brand) 0%, var(--brand-2) 62%, #001730 100%);
+    color:#fff;
+    padding:22px 0 30px;
+    overflow:hidden;
+  }
+  header.top::after{
+    content:"";position:absolute;inset:auto 0 0 0;height:1px;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);
+  }
+  .top-row{display:flex;align-items:center;justify-content:space-between;gap:14px;}
+  .brand-mark{display:flex;align-items:center;gap:12px;min-width:0;}
+  .brand-mark img{height:34px;width:auto;display:block;filter:drop-shadow(0 2px 10px rgba(0,0,0,.25));}
+  .brand-copy{display:flex;flex-direction:column;min-width:0;}
+  .brand-copy .app-name{font-family:var(--font-display);font-weight:700;font-size:1.18rem;
+    letter-spacing:-.01em;line-height:1.15;color:#fff;}
+  .brand-copy .app-sub{font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--accent-light);opacity:.85;}
+  .top-actions{display:flex;align-items:center;gap:8px;flex:none;}
+  .icon-btn{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:40px;height:40px;border-radius:var(--radius-full);
+    background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);
+    color:#fff;cursor:pointer;transition:background .18s var(--ease),transform .15s var(--ease);
+  }
+  .icon-btn:hover{background:rgba(255,255,255,.22);}
+  .icon-btn:active{transform:scale(.93);}
+  .icon-btn .icon{width:19px;height:19px;}
+  #themeToggle .icon-moon{display:none;}
+  html[data-theme="dark"] #themeToggle .icon-sun{display:none;}
+  html[data-theme="dark"] #themeToggle .icon-moon{display:block;}
+
+  #userBar{display:flex;align-items:center;gap:10px;margin-top:16px;flex-wrap:wrap;}
+  #userEmailLabel{font-size:.78rem;color:rgba(255,255,255,.78);
+    background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.14);
+    padding:5px 11px 5px 11px;border-radius:var(--radius-full);
+    max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .btn-ghost-light{
+    display:inline-flex;align-items:center;gap:6px;background:transparent;
+    border:1px solid rgba(255,255,255,.32);color:#fff;padding:6px 13px;
+    border-radius:var(--radius-full);font-family:var(--font-body);font-weight:600;font-size:.78rem;
+    cursor:pointer;transition:background .18s var(--ease),border-color .18s var(--ease);
+  }
+  .btn-ghost-light:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.5);}
+
+  main{display:block;padding-top:22px;}
+
+  /* ===== Kartu ringkasan (Hari ini / Bulan ini) ===== */
+  .stat-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:12px;
+    margin:-40px 0 22px;position:relative;z-index:2;
+  }
+  .stat-card{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);
+    padding:16px 16px 15px;box-shadow:var(--shadow-md);
+    display:flex;flex-direction:column;gap:6px;min-width:0;
+    animation:riseIn .5s var(--ease) both;
+  }
+  .stat-card .stat-label{
+    display:flex;align-items:center;gap:6px;font-size:.72rem;font-weight:700;
+    text-transform:uppercase;letter-spacing:.06em;color:var(--brand-light);
+  }
+  .stat-card .stat-label .icon{width:14px;height:14px;color:var(--accent-ink);}
+  .stat-card .stat-value{
+    font-family:var(--font-mono);font-weight:600;font-size:clamp(1.5rem,5vw,2rem);
+    letter-spacing:-.02em;color:var(--brand-text);line-height:1.05;
+  }
+  .stat-card .stat-value .unit{font-size:.55em;font-weight:600;color:var(--brand-light);margin-left:2px;}
+  #todayDetail,#monthDetail,#totalDetailFilter{display:flex;flex-wrap:wrap;gap:4px 10px;margin-top:2px;}
+  .stat-chip{
+    display:inline-flex;align-items:center;gap:4px;font-size:.74rem;font-weight:600;
+    color:var(--brand-light);font-family:var(--font-body);
+  }
+  .stat-chip .icon{width:13px;height:13px;color:var(--accent-ink);opacity:.85;}
+  .stat-chip b{font-family:var(--font-mono);color:var(--ink);font-weight:600;}
+
+  @keyframes riseIn{
+    from{opacity:0;transform:translateY(10px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+  .stat-card:nth-child(2){animation-delay:.05s;}
+
+  /* ===== Grid konten utama ===== */
+  .main-grid{display:grid;grid-template-columns:1fr;gap:16px;}
+  @media (min-width:900px){
+    .main-grid{grid-template-columns:minmax(320px,400px) 1fr;align-items:start;}
+  }
+
+  section.card{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);
+    padding:20px;box-shadow:var(--shadow-sm);
+  }
+  section.card + section.card{margin-top:16px;}
+  .card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;}
+  .card-head h2{font-size:1.05rem;}
+  .card-head .hint{font-size:.78rem;color:var(--brand-light);font-weight:500;}
+  .section-icon{
+    display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;
+    border-radius:9px;background:var(--paper-2);color:var(--accent-ink);flex:none;
+  }
+  .section-icon .icon{width:16px;height:16px;}
+  .title-row{display:flex;align-items:center;gap:10px;}
+
+  /* ===== Form ===== */
+  label{display:block;font-size:.8rem;font-weight:700;color:var(--brand-text);margin:0 0 6px 2px;}
+  .field{margin-bottom:14px;}
+  .hint-text{font-size:.74rem;color:var(--brand-light);margin-top:5px;}
+  .err-text{font-size:.76rem;color:var(--danger);margin-top:5px;display:none;font-weight:600;}
+  .field.has-error .err-text{display:block;}
+  .field.has-error input,.field.has-error select,.field.has-error textarea{border-color:var(--danger)!important;}
+
+  input,select,textarea{
+    width:100%;max-width:100%;min-width:0;font-family:var(--font-body);font-size:.95rem;
+    padding:11px 13px;border-radius:var(--radius);border:1.5px solid var(--line-strong);
+    background:var(--surface);color:var(--ink);transition:border-color .15s var(--ease),box-shadow .15s var(--ease);
+    appearance:none;-webkit-appearance:none;
+  }
+  input[type="date"],input[type="time"]{min-width:0;font-family:var(--font-mono);letter-spacing:-.01em;}
+  textarea{resize:vertical;min-height:64px;font-family:var(--font-body);}
+  input::placeholder,textarea::placeholder{color:var(--brand-light);opacity:.7;}
+  input:focus,select:focus,textarea:focus{
+    outline:none;border-color:var(--brand);box-shadow:0 0 0 4px rgba(0,68,158,.13);
+  }
+  html[data-theme="dark"] input:focus,html[data-theme="dark"] select:focus,html[data-theme="dark"] textarea:focus{
+    box-shadow:0 0 0 4px rgba(111,168,255,.18);
+  }
+  input:disabled,select:disabled,textarea:disabled{opacity:.55;cursor:not-allowed;}
+  :focus-visible{outline:2.5px solid var(--accent-ink);outline-offset:2px;}
+
+  /* Baris berpasangan (jumlah+jarak, dsb). Dua kolom di layar lebar, tumpuk di HP. */
+  .row2{display:grid;grid-template-columns:1fr;gap:10px;}
+  @media (min-width:520px){ .row2{grid-template-columns:1fr 1fr;} }
+  .row2 > div{min-width:0;}
+
+  /* Baris tanggal & jam — sengaja SELALU 1 kolom di bawah 640px (bukan cuma <480px)
+     supaya widget native date/time tidak pernah diminta berbagi ruang sempit;
+     ini yang menutup celah overflow di HP yang sebelumnya kambuh. */
+  .dt-row{display:grid;grid-template-columns:1fr;gap:10px;}
+  @media (min-width:640px){ .dt-row{grid-template-columns:1fr 1fr;} }
+  .dt-row > div{min-width:0;width:100%;}
+  .dt-row input{min-width:0;width:100%;}
+
+  /* ===== Tombol ===== */
+  button{font-family:var(--font-body);}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:7px;
+    min-height:46px;padding:0 18px;border-radius:var(--radius-full);
+    font-weight:700;font-size:.92rem;border:1.5px solid transparent;cursor:pointer;
+    transition:background .16s var(--ease),transform .12s var(--ease),border-color .16s var(--ease),opacity .16s var(--ease);
+    -webkit-tap-highlight-color:transparent;
+  }
+  .btn .icon{width:17px;height:17px;}
+  .btn:active{transform:scale(.97);}
+  .btn:disabled{opacity:.55;cursor:not-allowed;transform:none;}
+  .btn-block{width:100%;}
+  .btn-primary{background:var(--brand);color:#fff;box-shadow:0 6px 16px -6px rgba(0,68,158,.55);}
+  .btn-primary:hover{background:var(--brand-2);}
+  .btn-secondary{background:var(--paper-2);color:var(--brand-text);border-color:var(--line);}
+  .btn-secondary:hover{background:var(--line);}
+  .btn-outline{background:transparent;color:var(--ink);border-color:var(--line-strong);}
+  .btn-outline:hover{background:var(--paper-2);}
+  .btn-danger{background:var(--danger);color:#fff;box-shadow:0 6px 16px -6px rgba(189,59,46,.5);}
+  .btn-danger:hover{filter:brightness(1.08);}
+  .btn-danger-ghost{background:var(--danger-bg);color:var(--danger);border-color:transparent;}
+  .btn-danger-ghost:hover{filter:brightness(.96);}
+  .btn-sm{min-height:36px;padding:0 13px;font-size:.8rem;border-radius:var(--radius-full);}
+  .btn-icon-only{min-width:40px;min-height:40px;padding:0;border-radius:var(--radius-full);}
+
+  .mode-toggle{display:flex;gap:8px;margin-bottom:16px;background:var(--paper-2);padding:4px;border-radius:var(--radius-full);}
+  .mode-btn{
+    flex:1 1 0;display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    min-height:38px;border-radius:var(--radius-full);border:none;background:transparent;
+    color:var(--brand-light);font-weight:700;font-size:.82rem;cursor:pointer;
+    transition:background .18s var(--ease),color .18s var(--ease),box-shadow .18s var(--ease);
+  }
+  .mode-btn .icon{width:15px;height:15px;}
+  .mode-btn.active{background:var(--surface);color:var(--brand-text);box-shadow:var(--shadow-sm);}
+
+  /* Baris tujuan mode "banyak tujuan" — dibuat oleh tambahBarisStop() */
+  .ms-row{display:flex;gap:8px;align-items:center;margin-bottom:8px;}
+  .ms-row .ac-wrap{flex:1;min-width:0;}
+  .ms-row .ms-jumlah{
+    flex:none;width:58px;padding:11px 4px;text-align:center;
+  }
+  .ms-row button{
+    flex:none;width:40px;height:40px;min-height:40px;padding:0;border-radius:var(--radius);
+    background:var(--danger-bg);color:var(--danger);border:none;
+  }
+  .ms-row button .icon{width:15px;height:15px;}
+
+  /* Dropdown saran tujuan favorit (menggantikan datalist, juga jalan di Safari iOS) */
+  .ac-wrap{position:relative;}
+  .fav-suggest{
+    position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:30;
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow-lg);max-height:220px;overflow-y:auto;
+    opacity:0;transform:translateY(-4px);pointer-events:none;
+    transition:opacity .15s var(--ease),transform .15s var(--ease);
+  }
+  .fav-suggest.show{opacity:1;transform:translateY(0);pointer-events:auto;}
+  .fav-suggest-item{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:10px 13px;cursor:pointer;border-bottom:1px solid var(--line);
+  }
+  .fav-suggest-item:last-child{border-bottom:none;}
+  .fav-suggest-item:hover{background:var(--paper-2);}
+  .fav-suggest-item .fs-name{font-weight:700;font-size:.85rem;color:var(--ink);}
+  .fav-suggest-item .fs-dist{font-family:var(--font-mono);font-size:.76rem;color:var(--brand-light);flex:none;}
+
+  /* ===== Kartu riwayat trip ===== */
+  #tripList{display:flex;flex-direction:column;gap:10px;}
+  .trip-card{
+    display:flex;gap:12px;align-items:flex-start;padding:14px;
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    animation:cardIn .38s var(--ease) both;
+  }
+  @keyframes cardIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+  .trip-date{
+    flex:none;width:52px;text-align:center;padding:8px 4px;border-radius:10px;
+    background:var(--paper-2);
+  }
+  .trip-date .d-num{display:block;font-family:var(--font-mono);font-weight:700;font-size:1.05rem;color:var(--brand-text);line-height:1;}
+  .trip-date .d-mon{display:block;font-size:.62rem;font-weight:700;text-transform:uppercase;color:var(--brand-light);margin-top:3px;letter-spacing:.03em;}
+  .trip-body{flex:1;min-width:0;}
+  .trip-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  .trip-dest{font-weight:700;color:var(--ink);font-size:.96rem;line-height:1.35;}
+  .trip-dest .dest-badge{
+    display:inline-flex;align-items:center;gap:4px;background:var(--paper-2);color:var(--brand-text);
+    padding:2px 9px 2px 7px;border-radius:var(--radius-full);font-size:.78rem;font-weight:700;
+    margin:2px 5px 2px 0;
+  }
+  .trip-dest .dest-badge .icon{width:11px;height:11px;color:var(--accent-ink);}
+  .trip-time{font-family:var(--font-mono);font-size:.74rem;color:var(--brand-light);font-weight:600;white-space:nowrap;}
+  .trip-note{font-size:.82rem;color:var(--brand-light);margin-top:5px;line-height:1.45;}
+  .trip-stats{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:10px;}
+  .trip-stat{display:flex;flex-direction:column;}
+  .trip-stat .t-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--brand-light);}
+  .trip-stat .t-value{font-family:var(--font-mono);font-weight:600;font-size:.94rem;color:var(--ink);}
+  .trip-actions{display:flex;gap:6px;flex:none;margin-top:2px;}
+  .icon-btn-ghost{
+    width:40px;height:40px;min-height:40px;padding:0;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;
+    background:transparent;border:1px solid var(--line);color:var(--brand-light);cursor:pointer;flex:none;
+    transition:background .15s var(--ease),color .15s var(--ease),border-color .15s var(--ease);
+  }
+  .icon-btn-ghost:hover{background:var(--paper-2);color:var(--brand-text);}
+  .icon-btn-ghost.danger:hover{background:var(--danger-bg);color:var(--danger);border-color:transparent;}
+  .icon-btn-ghost .icon{width:16px;height:16px;}
+
+  /* ===== Tempat sampah — sama, tapi diredupkan ===== */
+  .trash-card{opacity:.82;}
+  .trash-card .trip-date{background:var(--paper);}
+  .trash-card .trip-dest{color:var(--brand-light);}
+  .trash-card .trip-actions .icon-btn-ghost.restore:hover{background:var(--success-bg);color:var(--success);border-color:transparent;}
+
+  /* ===== Favorit ===== */
+  #listFavorit{display:flex;flex-direction:column;gap:8px;}
+  .fav-item{
+    display:flex;align-items:center;gap:10px;padding:10px 12px;
+    background:var(--paper-2);border-radius:var(--radius);border:1px solid transparent;
+  }
+  .fav-item .fav-icon{
+    flex:none;width:30px;height:30px;border-radius:var(--radius-full);background:var(--surface);
+    display:flex;align-items:center;justify-content:center;color:var(--accent-ink);border:1px solid var(--line);
+  }
+  .fav-item .fav-icon .icon{width:14px;height:14px;}
+  .fav-item .fav-name{flex:1;min-width:0;font-weight:700;font-size:.87rem;color:var(--ink);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .fav-item .fav-dist{font-family:var(--font-mono);font-size:.78rem;color:var(--brand-light);font-weight:600;flex:none;}
+
+  /* ===== Empty state ===== */
+  .empty-state{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:42px 20px;color:var(--brand-light);gap:10px;
+  }
+  .empty-state .empty-icn{
+    width:52px;height:52px;border-radius:var(--radius-full);background:var(--paper-2);
+    display:flex;align-items:center;justify-content:center;color:var(--accent-ink);margin-bottom:2px;
+  }
+  .empty-state .empty-icn .icon{width:24px;height:24px;}
+  .empty-state .empty-title{font-weight:700;color:var(--ink);font-size:.92rem;}
+  .empty-state .empty-sub{font-size:.8rem;max-width:280px;}
+
+  /* ===== Badge status ===== */
+  .badge{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;font-weight:700;
+    padding:3px 10px;border-radius:var(--radius-full);}
+  .badge-success{background:var(--success-bg);color:var(--success);}
+  .badge-danger{background:var(--danger-bg);color:var(--danger);}
+  .badge-warning{background:var(--warning-bg);color:var(--warning);}
+
+  /* ===== Modal (edit & konfirmasi) ===== */
+  .modal-backdrop{
+    position:fixed;inset:0;background:var(--overlay);backdrop-filter:blur(3px);
+    display:flex;align-items:flex-end;justify-content:center;z-index:80;
+    opacity:0;pointer-events:none;transition:opacity .22s var(--ease);padding:0;
+  }
+  .modal-backdrop.show{opacity:1;pointer-events:auto;}
+  @media (min-width:640px){ .modal-backdrop{align-items:center;padding:20px;} }
+  .modal-box{
+    background:var(--surface);width:100%;max-width:480px;max-height:88vh;overflow-y:auto;
+    border-radius:20px 20px 0 0;box-shadow:var(--shadow-lg);
+    padding:22px 20px calc(20px + env(safe-area-inset-bottom));
+    transform:translateY(24px);transition:transform .26s var(--ease);
+  }
+  @media (min-width:640px){ .modal-box{border-radius:var(--radius-xl);padding:26px;} }
+  .modal-backdrop.show .modal-box{transform:translateY(0);}
+  .modal-box h3{font-size:1.08rem;margin-bottom:14px;}
+  .modal-close{position:absolute;}
+  .modal-grabber{width:38px;height:4px;border-radius:99px;background:var(--line);margin:0 auto 14px;}
+  @media (min-width:640px){ .modal-grabber{display:none;} }
+  .modal-actions{display:flex;gap:10px;margin-top:18px;}
+  .modal-actions .btn{flex:1;}
+
+  /* ===== Modal konfirmasi (khusus) ===== */
+  .confirm-box{max-width:400px;text-align:center;padding-top:26px;}
+  .confirm-icon{
+    width:56px;height:56px;border-radius:var(--radius-full);margin:0 auto 16px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .confirm-icon .icon{width:26px;height:26px;}
+  .confirm-icon.tone-danger{background:var(--danger-bg);color:var(--danger);}
+  .confirm-icon.tone-brand{background:var(--paper-2);color:var(--brand-text);}
+  .confirm-title{font-family:var(--font-display);font-weight:700;font-size:1.08rem;color:var(--ink);margin-bottom:6px;}
+  .confirm-msg{font-size:.87rem;color:var(--brand-light);line-height:1.5;}
+
+  /* ===== Toast ===== */
+  #toastWrap{position:fixed;left:0;right:0;bottom:18px;display:flex;flex-direction:column;
+    align-items:center;gap:8px;z-index:70;pointer-events:none;padding:0 16px;}
+  .toast{
+    pointer-events:auto;display:flex;align-items:center;gap:10px;max-width:420px;width:100%;
+    background:var(--ink);color:#fff;padding:13px 16px;border-radius:14px;box-shadow:var(--shadow-lg);
+    font-size:.86rem;font-weight:600;
+    transform:translateY(16px);opacity:0;transition:transform .28s var(--ease),opacity .28s var(--ease);
+  }
+  html[data-theme="dark"] .toast{background:#1E2E4C;}
+  .toast.show{transform:translateY(0);opacity:1;}
+  .toast .t-icn{flex:none;width:22px;height:22px;border-radius:var(--radius-full);
+    display:flex;align-items:center;justify-content:center;}
+  .toast .t-icn .icon{width:13px;height:13px;}
+  .toast.toast-success .t-icn{background:var(--success);color:#fff;}
+  .toast.toast-error .t-icn{background:var(--danger);color:#fff;}
+  .toast.toast-info .t-icn{background:var(--accent);color:#fff;}
+
+  /* ===== Skeleton loading ===== */
+  .skeleton{background:linear-gradient(100deg,var(--paper-2) 30%,var(--line) 50%,var(--paper-2) 70%);
+    background-size:220% 100%;animation:shimmer 1.4s ease-in-out infinite;border-radius:8px;}
+  @keyframes shimmer{0%{background-position:150% 0;}100%{background-position:-50% 0;}}
+  .boot-skel{max-width:420px;margin:60px auto;padding:0 20px;display:flex;flex-direction:column;gap:14px;}
+  .boot-skel .sk-logo{width:90px;height:34px;border-radius:8px;margin:0 auto 8px;}
+  .boot-skel .sk-line{height:14px;border-radius:7px;}
+  .boot-skel .sk-card{height:76px;border-radius:var(--radius-lg);}
+
+  /* ===== Auth gate ===== */
+  #authGate{max-width:420px;margin:26px auto 0;}
+  .auth-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);
+    padding:26px 22px;box-shadow:var(--shadow-sm);}
+  .auth-card h2{font-size:1.15rem;text-align:center;margin-bottom:4px;}
+  .auth-sub{text-align:center;font-size:.82rem;color:var(--brand-light);margin-bottom:20px;}
+  .auth-links{display:flex;justify-content:space-between;align-items:center;margin-top:14px;flex-wrap:wrap;gap:8px;}
+  .auth-links button{background:none;border:none;color:var(--accent-ink);font-weight:700;font-size:.8rem;
+    cursor:pointer;padding:4px 2px;}
+  /* Dipakai oleh setAuthMsg() & note auto-isi jarak (f-tujuan-note) — kosong = tak
+     terlihat (tanpa perlu class show/hide terpisah), min-height jaga supaya layout
+     tak "lompat" begitu pesan muncul. */
+  .field-note{display:flex;align-items:center;gap:6px;font-size:.78rem;font-weight:600;
+    color:var(--accent-ink);min-height:1.3em;line-height:1.4;margin:6px 0 2px;}
+  .field-note .icon{width:13px;height:13px;flex:none;}
+  #authError{color:var(--danger);margin:2px 0 12px;}
+  #authError.is-ok{color:var(--success);}
+
+  /* ===== Accordion (Favorit / Sampah / Backup) ===== */
+  details.acc{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);
+    overflow:hidden;box-shadow:var(--shadow-sm);}
+  details.acc + details.acc{margin-top:12px;}
+  details.acc summary{
+    list-style:none;cursor:pointer;padding:16px 18px;display:flex;align-items:center;
+    justify-content:space-between;gap:10px;font-family:var(--font-display);font-weight:700;color:var(--brand-text);
+    -webkit-tap-highlight-color:transparent;
+  }
+  details.acc summary::-webkit-details-marker{display:none;}
+  details.acc summary .chev{color:var(--brand-light);transition:transform .22s var(--ease);flex:none;}
+  details.acc[open] summary .chev{transform:rotate(180deg);}
+  details.acc .acc-body{padding:0 18px 18px;}
+  details.acc .acc-body{animation:fadeDown .22s var(--ease) both;}
+  @keyframes fadeDown{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:translateY(0);}}
+
+  .filter-row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:12px;}
+  .filter-row .field{margin-bottom:0;flex:1 1 130px;}
+  .total-banner{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+    background:var(--paper-2);border-radius:var(--radius);padding:12px 14px;margin-top:4px;
+  }
+  .total-banner .value{font-family:var(--font-mono);font-weight:700;color:var(--brand-text);font-size:1.05rem;}
+
+  .backup-actions{display:flex;flex-wrap:wrap;gap:10px;}
+  .backup-actions .btn{flex:1 1 150px;}
+
+  /* ===== Laporan per Cafe ===== */
+  .report-presets{display:flex;gap:8px;flex-wrap:wrap;}
+  .chip-btn{
+    min-height:36px;padding:0 14px;border-radius:var(--radius-full);border:1.5px solid var(--line);
+    background:var(--surface);color:var(--brand-light);font-weight:700;font-size:.78rem;cursor:pointer;
+    transition:background .16s var(--ease),color .16s var(--ease),border-color .16s var(--ease);
+  }
+  .chip-btn.active{background:var(--brand);color:#fff;border-color:var(--brand);}
+  .highlight-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .highlight-card{
+    border-radius:var(--radius);padding:14px 15px;display:flex;flex-direction:column;gap:4px;
+    border:1px solid var(--line);background:var(--paper-2);
+  }
+  .highlight-card.tone-top{background:var(--success-bg);border-color:transparent;}
+  .highlight-card.tone-bottom{background:var(--warning-bg);border-color:transparent;}
+  .hl-label{display:flex;align-items:center;gap:5px;font-size:.68rem;font-weight:700;text-transform:uppercase;
+    letter-spacing:.04em;color:var(--brand-light);}
+  .highlight-card.tone-top .hl-label{color:var(--success);}
+  .highlight-card.tone-bottom .hl-label{color:var(--warning);}
+  .hl-label .icon{width:13px;height:13px;}
+  .hl-name{font-family:var(--font-display);font-weight:700;font-size:1rem;color:var(--ink);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .hl-value{font-size:.76rem;color:var(--brand-light);font-weight:600;}
+  .hl-value b{color:var(--ink);}
+
+  .cafe-table{width:100%;border-collapse:collapse;min-width:300px;font-size:.85rem;table-layout:fixed;}
+  .cafe-table th{
+    text-align:left;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.02em;
+    color:var(--brand-light);padding:0 5px 10px;border-bottom:1.5px solid var(--line);cursor:pointer;
+    white-space:nowrap;user-select:none;
+  }
+  .cafe-table th:first-child{padding-left:0;}
+  .cafe-table th.num{text-align:right;}
+  .cafe-table th::after{content:'';display:inline-block;width:0;height:0;margin-left:4px;vertical-align:middle;
+    border-left:4px solid transparent;border-right:4px solid transparent;opacity:.4;}
+  .cafe-table th.sort-asc::after{border-bottom:5px solid var(--brand-text);opacity:1;}
+  .cafe-table th.sort-desc::after{border-top:5px solid var(--brand-text);opacity:1;}
+  .cafe-table td{padding:11px 5px;border-bottom:1px solid var(--line);}
+  .cafe-table td:first-child{white-space:normal;line-height:1.3;word-break:break-word;padding-left:0;}
+  .cafe-table td:not(:first-child){white-space:nowrap;}
+  .cafe-table td.num{text-align:right;font-family:var(--font-mono);}
+  .cafe-table tbody tr:hover{background:var(--paper-2);}
+  .cafe-table tbody tr:last-child td{border-bottom:none;}
+  .trend-up,.trend-down,.trend-flat{display:inline-flex;align-items:center;gap:3px;font-weight:700;font-family:var(--font-mono);}
+  .trend-up{color:var(--success);}
+  .trend-down{color:var(--danger);}
+  .trend-flat{color:var(--brand-light);}
+  .trend-up .icon,.trend-down .icon{width:13px;height:13px;}
+
+  .cafe-name-link{
+    background:none;border:none;padding:0;font:inherit;color:var(--brand-text);font-weight:700;
+    cursor:pointer;text-decoration:underline;text-decoration-color:var(--line-strong);
+    text-underline-offset:3px;text-align:left;
+  }
+  .cafe-name-link:hover{text-decoration-color:var(--brand-text);}
+
+  .th-with-info{display:inline-flex;align-items:center;gap:3px;}
+  .info-dot{
+    width:13px;height:13px;border-radius:50%;border:1.5px solid var(--brand-light);background:none;
+    color:var(--brand-light);font-size:.58rem;font-weight:700;font-style:italic;font-family:Georgia,serif;
+    display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;line-height:1;
+    text-transform:none;flex:none;
+  }
+  .info-dot:hover{border-color:var(--brand-text);color:var(--brand-text);}
+
+  /* ===== Kalender pemesanan per cafe ===== */
+  .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .cal-month-label{font-family:var(--font-display);font-weight:700;color:var(--ink);font-size:1rem;}
+  .cal-dow-row{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px;}
+  .cal-dow{text-align:center;font-size:.66rem;font-weight:700;color:var(--brand-light);text-transform:uppercase;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+  .cal-cell{
+    aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    border-radius:9px;background:var(--paper-2);
+  }
+  .cal-cell.empty{background:transparent;}
+  .cal-cell .cal-daynum{font-size:.76rem;font-weight:600;color:var(--brand-light);line-height:1;}
+  .cal-cell .cal-count{font-size:.6rem;font-family:var(--font-mono);color:var(--ink);opacity:.7;line-height:1;margin-top:2px;}
+  .cal-cell.has-order .cal-daynum{color:var(--ink);font-weight:700;}
+  .cal-cell.tier-1{background:rgba(0,68,158,.3);}
+  .cal-cell.tier-2{background:rgba(0,68,158,.6);}
+  .cal-cell.tier-3{background:var(--brand);}
+  .cal-cell.tier-3 .cal-daynum,.cal-cell.tier-3 .cal-count{color:#fff;opacity:1;}
+  .cal-cell.today{box-shadow:0 0 0 2px var(--accent-ink) inset;}
+  .cal-legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;}
+  .cal-legend-item{display:flex;align-items:center;gap:5px;font-size:.72rem;color:var(--brand-light);font-weight:600;}
+  .cal-swatch{width:12px;height:12px;border-radius:4px;background:var(--paper-2);flex:none;}
+  .cal-swatch.tier-1{background:rgba(0,68,158,.3);}
+  .cal-swatch.tier-3{background:var(--brand);}
+
+  footer.note{text-align:center;color:var(--brand-light);font-size:.76rem;padding:26px 18px 6px;}
+
+  /* ===== Spinner tombol ===== */
+  .spinner{width:16px;height:16px;border-radius:50%;border:2.5px solid rgba(255,255,255,.4);
+    border-top-color:#fff;animation:spin .7s linear infinite;flex:none;}
+  .spinner.dark{border:2.5px solid var(--line);border-top-color:var(--brand-text);}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* ===== Responsif ===== */
+  @media (max-width:899px){
+    .stat-grid{margin-top:-34px;}
+  }
+  @media (max-width:480px){
+    .shell{padding:0 14px;}
+    header.top{padding:18px 0 26px;}
+    section.card{padding:16px;}
+    .trip-actions{flex-direction:column;}
+    .stat-card{padding:14px 13px 13px;}
+    .highlight-grid{grid-template-columns:1fr;}
+  }
+
+  /* ===== Nilai transaksi (Rp) ===== */
+  .ms-row{flex-wrap:wrap;}
+  .ms-row .ms-jumlah{order:1;}
+  .ms-row button{order:2;}
+  .ms-row .ms-nilai{order:3;flex:1 1 100%;width:100%;text-align:left;font-family:var(--font-mono);}
+  .ms-nilai-total{font-weight:700;color:var(--brand-text);}
+  .nilai-rincian{display:flex;flex-wrap:wrap;gap:5px 6px;margin-top:8px;}
+  .nilai-rincian span{font-size:.72rem;font-weight:600;color:var(--brand-light);background:var(--paper-2);border-radius:var(--radius-full);padding:2px 9px;}
+  .nilai-rincian b{font-family:var(--font-mono);color:var(--ink);font-weight:600;}
+  .stat-nilai,.total-nilai{font-size:.74rem;font-weight:600;color:var(--brand-light);margin-top:2px;line-height:1.4;}
+  .stat-nilai b,.total-nilai b{font-family:var(--font-mono);color:var(--ink);font-weight:600;}
+  .cal-cell .cal-nilai{font-size:.5rem;font-family:var(--font-mono);color:var(--brand-light);line-height:1;margin-top:1px;white-space:nowrap;}
+  .cal-cell.tier-3 .cal-nilai{color:rgba(255,255,255,.85);}
+  .nilai-block{margin-top:22px;padding-top:18px;border-top:1.5px solid var(--line);}
+  .sub-block-title{font-family:var(--font-display);font-weight:700;color:var(--brand-text);font-size:.92rem;margin:20px 0 8px;}
+  .nilai-tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .nilai-tile{background:var(--paper-2);border-radius:var(--radius);padding:12px 13px;display:flex;flex-direction:column;gap:4px;min-width:0;}
+  .nilai-tile .nt-value{font-family:var(--font-mono);font-weight:700;font-size:1rem;color:var(--brand-text);overflow-wrap:anywhere;}
+  .nilai-compare{font-size:.8rem;font-weight:600;color:var(--brand-light);margin:10px 0 2px;line-height:1.45;}
+  .nilai-compare b,.nilai-compare .num-mono{color:var(--ink);}
+  .sort-chips{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 10px;}
+  .rank-no{font-family:var(--font-mono);font-size:.7rem;font-weight:700;color:var(--accent-ink);margin-right:2px;}
+  .nilai-cafe-name{font-weight:700;color:var(--ink);}
+  .nilai-bar-wrap{height:5px;border-radius:3px;background:var(--paper-2);margin-top:6px;overflow:hidden;min-width:48px;}
+  .nilai-bar{height:100%;background:var(--brand);border-radius:3px;}
+  .pos-export{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-top:18px;padding-top:14px;border-top:1.5px dashed var(--line);}
+  .pos-export .field{margin:0;flex:1 1 180px;min-width:0;}
+  .pos-export .btn{flex:1 1 200px;}
+  .nilai-table td.num{font-size:.8rem;}
+  .nilai-table td .hint-text{white-space:normal;}
+  .cafe-table td.wrap{white-space:normal;}
+
+  /* ===== Laporan per Cafe: transaksi + nilai dalam satu tampilan ===== */
+  .rp-kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  @media (min-width:760px){ .rp-kpis{grid-template-columns:repeat(4,1fr);} }
+  .rp-kpi{background:var(--paper-2);border-radius:var(--radius);padding:12px 13px;display:flex;flex-direction:column;gap:4px;min-width:0;}
+  .rp-kpi .hl-label{font-size:.64rem;}
+  .rp-kpi-value{font-family:var(--font-mono);font-weight:700;font-size:1.02rem;color:var(--brand-text);overflow-wrap:anywhere;line-height:1.25;}
+  .rp-kpi-sub{font-family:var(--font-body);font-size:.72rem;color:var(--brand-light);font-weight:600;line-height:1.4;}
+  .rp-kpi-sub .num-mono{color:var(--ink);}
+  .rp-kpi-hero{background:var(--brand);}
+  .rp-kpi-hero .hl-label,.rp-kpi-hero .rp-kpi-sub{color:rgba(255,255,255,.88);}
+  .rp-kpi-hero .rp-kpi-value{color:#fff;font-size:1.12rem;}
+  .rp-kpi-hero .trend-up{color:#b8f2cf;}
+  .rp-kpi-hero .trend-down{color:#ffd1c4;}
+  .rp-kpi-hero .num-mono{color:#fff;}
+  .rp-meter{height:6px;border-radius:3px;background:var(--line);overflow:hidden;margin:4px 0 2px;}
+  .rp-meter-fill{height:100%;width:0;background:var(--success);border-radius:3px;transition:width .3s var(--ease);}
+  .rp-insights{list-style:none;margin:0;padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);display:flex;flex-direction:column;gap:9px;}
+  .rp-insights li{display:flex;gap:9px;align-items:flex-start;font-size:.84rem;line-height:1.45;color:var(--brand-light);}
+  .rp-insights li b{color:var(--ink);}
+  .rp-insights .icon{width:15px;height:15px;flex:none;margin-top:2px;color:var(--brand);}
+  .rp-sub{font-family:var(--font-body);font-size:.72rem;font-weight:600;color:var(--brand-light);}
+  .rp-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .rp-table td.c-nilai .nilai-bar-wrap{margin-top:6px;}
+  .rp-tren{display:flex;justify-content:flex-end;align-items:center;gap:5px;white-space:nowrap;line-height:1.6;}
+  .mchart-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;padding:2px 0 8px;}
+  .mchart{display:flex;align-items:flex-end;gap:4px;min-width:100%;}
+  .mcol{flex:0 0 68px;display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;}
+  .mcol.is-prev{opacity:.6;}
+  .mcol-val{font-family:var(--font-mono);font-size:.7rem;font-weight:700;color:var(--ink);white-space:nowrap;}
+  .mcol-track{height:110px;width:100%;display:flex;align-items:flex-end;justify-content:center;}
+  .mcol-bar{width:60%;max-width:38px;background:var(--brand);border-radius:6px 6px 2px 2px;min-height:0;transition:height .3s var(--ease);}
+  .mcol-bar.is-empty{background:none;border:1.5px dashed var(--line-strong);min-height:10px;}
+  .mcol-name{font-size:.74rem;font-weight:700;color:var(--brand-text);white-space:nowrap;}
+  .mcol-tag{font-size:.56rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--brand-light);background:var(--paper-2);border-radius:var(--radius-full);padding:1px 6px;white-space:nowrap;}
+  .mcol-tag.now{color:var(--warning);background:var(--warning-bg);}
+  .mcol-sub{font-size:.66rem;color:var(--brand-light);font-weight:600;white-space:nowrap;}
+  .mcol-chg{display:flex;flex-direction:column;align-items:center;font-family:var(--font-mono);font-size:.7rem;font-weight:700;line-height:1.3;white-space:nowrap;}
+  .mcol-chg .rp-sub{font-size:.62rem;}
+  .rp-howto{margin-top:12px;}
+  .rp-howto summary{cursor:pointer;font-weight:700;color:var(--brand-text);font-size:.84rem;}
+  .rp-howto ul{margin:8px 0 0;padding-left:18px;font-size:.8rem;color:var(--brand-light);line-height:1.5;display:flex;flex-direction:column;gap:4px;}
+  .rp-howto b{color:var(--ink);}
+  /* HP: setiap cafe jadi kartu kecil, tanpa kolom yang terpotong */
+  @media (max-width:600px){
+    .rp-table thead{display:none;}
+    .rp-table,.rp-table tbody{display:block;width:100%;min-width:0;}
+    .rp-table tbody tr{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px;padding:14px 0;border-bottom:1px solid var(--line);}
+    .rp-table tbody tr:last-child{border-bottom:none;}
+    .rp-table td{display:block;padding:0;border:none;text-align:left !important;white-space:normal !important;}
+    .rp-table td::before{content:attr(data-label);display:block;font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--brand-light);margin-bottom:3px;}
+    .rp-table td.c-nama{grid-column:1/-1;order:0;}
+    .rp-table td.c-nama::before{content:none;}
+    .rp-table td.c-nilai{grid-column:1/-1;order:1;}
+    .rp-table td.c-trx{order:2;}
+    .rp-table td.c-rata{order:2;}
+    .rp-table td.c-tren{grid-column:1/-1;order:3;}
+    .rp-table td.c-tren .rp-tren{justify-content:flex-start;}
+    .rp-table td.c-trx,.rp-table td.c-rata{font-size:.95rem;}
+  }
+
+  /* ===== Gerak dikurangi ===== */
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{
+      animation-duration:.001ms!important;animation-iteration-count:1!important;
+      transition-duration:.001ms!important;scroll-behavior:auto!important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ Sprite ikon (SVG inline, tanpa dependensi CDN) ============ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+  <symbol id="icon-pin" viewBox="0 0 24 24"><path d="M12 21s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12Z"/><circle cx="12" cy="9" r="2.4"/></symbol>
+  <symbol id="icon-box" viewBox="0 0 24 24"><path d="M3.5 8.2 12 4l8.5 4.2v8.6L12 21l-8.5-4.2V8.2Z"/><path d="M3.7 8.4 12 12.5l8.3-4.1"/><path d="M12 12.5V21"/></symbol>
+  <symbol id="icon-calendar" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17"/></symbol>
+  <symbol id="icon-edit" viewBox="0 0 24 24"><path d="M4 20h4.2L19 9.2a2.4 2.4 0 0 0 0-3.4l-.8-.8a2.4 2.4 0 0 0-3.4 0L4 15.8V20Z"/><path d="m13.5 6 4.5 4.5"/></symbol>
+  <symbol id="icon-trash" viewBox="0 0 24 24"><path d="M4.5 7h15"/><path d="M9.5 7V5a1.5 1.5 0 0 1 1.5-1.5h2A1.5 1.5 0 0 1 14.5 5v2"/><path d="M6.5 7 7.3 19a2 2 0 0 0 2 1.9h5.4a2 2 0 0 0 2-1.9L17.5 7"/><path d="M10.3 11v6M13.7 11v6"/></symbol>
+  <symbol id="icon-undo" viewBox="0 0 24 24"><path d="M4.5 8.5H12a6 6 0 1 1-5.3 8.9"/><path d="M4.5 4.5v4h4"/></symbol>
+  <symbol id="icon-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="icon-download" viewBox="0 0 24 24"><path d="M12 3.5v12M7.5 11l4.5 4.5L16.5 11"/><path d="M4.5 17.5v2A1.5 1.5 0 0 0 6 21h12a1.5 1.5 0 0 0 1.5-1.5v-2"/></symbol>
+  <symbol id="icon-upload" viewBox="0 0 24 24"><path d="M12 20.5v-12M7.5 12.5 12 8l4.5 4.5"/><path d="M4.5 17.5v2A1.5 1.5 0 0 0 6 21h12a1.5 1.5 0 0 0 1.5-1.5v-2"/></symbol>
+  <symbol id="icon-logout" viewBox="0 0 24 24"><path d="M9 4.5H6A1.5 1.5 0 0 0 4.5 6v12A1.5 1.5 0 0 0 6 19.5h3"/><path d="M20 12H10.5M20 12l-4-4M20 12l-4 4"/></symbol>
+  <symbol id="icon-check" viewBox="0 0 24 24"><path d="M4.5 12.8 9.2 17.5 19.5 6.7"/></symbol>
+  <symbol id="icon-alert" viewBox="0 0 24 24"><path d="M12 3.5 22 20.5H2L12 3.5Z"/><path d="M12 10v4.2"/><circle cx="12" cy="17.4" r=".4" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"/></symbol>
+  <symbol id="icon-moon" viewBox="0 0 24 24"><path d="M20.5 14.6A8.7 8.7 0 1 1 9.4 3.5a7 7 0 0 0 11.1 11.1Z"/></symbol>
+  <symbol id="icon-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="icon-filter" viewBox="0 0 24 24"><path d="M3.5 5h17L14 13v6l-4 2v-8L3.5 5Z"/></symbol>
+  <symbol id="icon-inbox" viewBox="0 0 24 24"><path d="M3.5 12.5h5.2l1.5 2.6h3.6l1.5-2.6h5.2"/><path d="m6 5 -2.5 7.5v6A1.5 1.5 0 0 0 5 20h14a1.5 1.5 0 0 0 1.5-1.5v-6L18 5Z"/></symbol>
+  <symbol id="icon-mail" viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="m4.5 7 7.5 6 7.5-6"/></symbol>
+  <symbol id="icon-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="9.5" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></symbol>
+  <symbol id="icon-trend-up" viewBox="0 0 24 24"><path d="M3.5 16.5 10 10l4 4 6.5-7"/><path d="M15.5 6.5h5v5"/></symbol>
+  <symbol id="icon-trend-down" viewBox="0 0 24 24"><path d="M3.5 7.5 10 14l4-4 6.5 7"/><path d="M15.5 17.5h5v-5"/></symbol>
+  <symbol id="icon-chart" viewBox="0 0 24 24"><path d="M4 20V4"/><path d="M4 20h16"/><rect x="7.5" y="12" width="3" height="8"/><rect x="13" y="8" width="3" height="12"/><rect x="18" y="14" width="2.5" height="6"/></symbol>
+  <symbol id="icon-chevron-left" viewBox="0 0 24 24"><path d="M15 5.5 8 12l7 6.5"/></symbol>
+  <symbol id="icon-chevron-right" viewBox="0 0 24 24"><path d="M9 5.5 16 12l-7 6.5"/></symbol>
+</defs>
+</svg>
+
+<header class="top">
+  <div class="shell">
+    <div class="top-row">
+      <div class="brand-mark">
+        <img src="data:image/webp;base64,UklGRnpnAABXRUJQVlA4WAoAAAAQAAAAIQIANQEAQUxQSCE/AAAB/yckSPD/eGtEpO4jEAOgDdsIRFu8kP8Ptuy9ENH/Cah/dh5ozR0AknTxraq/bgOek0gmeUhYVemGwXllyUMG0twCw0MuErmqvGVlwTxnibM0cGi8F9dSVU0kcBdmoLy5eGdJOVnyxh/fm+4GgCZN2lKR5I+4SXdDkDdasrmDSHD4NOSDJF1lSzoNkMNLWSJN0k6yOE6ZKH83k7ohDyZJSdxFsu9ywdMXyfAO64ryFgBgoM3EWrmhRPLZHiakaXX3hEx4WDMASD+gu3u4PcwAkm5SHLSNJEmphD/qmbmHQURMAF/OsSeO+HhXPlaUfaiHjtrd0n1aeZZy0Uq3CYehK7U+qW0Vl1RRPrgCffiwONPSCiC1MrftgaB0Uh248LwEFOqq6LztIUCl1ipXWx2cU1S5TflAO6yjOtCiMkHZNhWgeMipdZzVoamlu+q28do2rag9lQ8ttZNXtbGNSVE5DT5Qx6C46rDYNsZVvhxssL/H6Qv//0OO/P97PF9Vne4Oh5+dtfGxbdu2dWbbtm1j922tbQ2TTDyZCZpplV7Px8HMJNVdz+xkP0cRMQGetm1W3Wq2rXgjGnQmWbLQktkezJCZk5mZmZmZZ5EZS/OvzOr8C7PG5VlLHmoTvrS63MJ9ZDEiJsDvtk+qJcm2ZebuA+cYkykmzxkRMyCDkrOycBU1k7QYdQZxaes/WOparS+SUVrakkBi5qKurIyoiJg03LRe8bPZ3UuNiAnwbNu2KkmybfW5REWNnII2894/tn9q/8BO7lQwM7u7uZkrkzCzyJLFc84xNkTE9tElKBkRE4A3lXkLJq5IUfx/Q5BY6xKblES8T6I4SdLsAAoi1gTOiVMg0yzJPN8AmTTPR9N5lWdlkXlvg4D0SRL3e51ef2fz0jIvC69/9jHWe+vL6mDUVvl4yTkB1Q+67a1LW41p7XiosAmycufiajoad7m3RhggEkcCJD2zNBk0Vtv50904zero9M8zzqVZPt6sJ3Vz0NRFYhgQCAGK+m57a/0Xv+dzzw9Li8FhbJI1J7utfNlYAv1/0O4qgCJm4073+mKZFkH+3MKGwtru2+vNsrWWQuBAAO2aosA3/uiv/f6vffnUYFgYjgcPHrYXhfcA3UJRV0xvfvbjh9zFAxVb7j98o/VB7dkwETERU68cUF5+8c//4kcaHhBB75V3Kh/drgsRpluqKj7fdP7rp2MemNh8dnyv+uGN9yDQvtnYbLz58Ne/qXkYcGnv+dHlTSFC2kX94vKrt5UORIytHp0OiptCSC0g+fHL64kZAuH48cnl2tN2qvOzj78hDA4+otLk0cWNiJBucHZ2lQB3nSsfvlvaCG2xHrurOsaDDZC7/6X5QoS2EOQWzbs7Tssf+tqt0JaHN91R5oGGP/pW+mIttK1bQ+md5o7dMrGirRckPj3AsIdPzl+svdD2mk9c2Tss8NXxULYPQBx7d0DByeLl+aagrcYnf26JO0uDskLoeyK17/2BBPP83oHQtuNPvs7dWc2mI6xk93x2ELFtH54lFH/47t/a3FE+bqYCO7Nzm8nBQ3j8+sCJAZBDU/H+VH7WX9P30OC26eCgwbnxE2MCE6Vy2/4UnLy6lu8lUr1zLDtgCMJqWWBkMDnel/2H269dk0rVxc1iIxrckSMxDxI0i6oOZkrphu2M+074DokGpvHmn/3RX3609jhIeDQcyAECyiloBzju+36/CU5OFqRQO488UnvnZ3/5N37nfz0OMnH7AAeHabdJgaGuNL0Z7TMm/uILr6A/+wAmg7/+n48/+Jt//s4Gh+Cw6/LAYHNjAFtlRnvcX8J7OyuCa+PlJyYdUHjy6+vlqsBJ6VjDHRDIzuaA1oTj3Whf4eYbtwLT1sNnQ1zd+zUFMATHJzI9ENB4kYS17kipsa+EB0NP8Oj/Nh12bbJuBJPwcC0+EEjPLGRqDgK/lO4n9bMbQXHnoY0x2UNl3hEU3LQf8LMA2HwqJux1QbO5j9j9rid099QLFezVVc8MDKWxRvRZADq57mBxyDW3f5TfeEnobOHBsuyJ7OTAMQrjnS2896E5mdKk4PB6yn1j3vIoth6bFOydzdN6iJIKL9B7f/jiBmyWSrvm9wmO3/5IUOlDfeR7+HoDBUzL0ALUQfM96UiQBZDxxf3CdqdLAvuF58r5cPblE4eSMWl4OIEhPivq3DvRg7fPvt6PAEEUcfx0n/vE+ZWAmDx4Ajnz/FldUMHEuQwjZhdVa5WklpWjX/+1n/uBr/ucq9LqMDtbCIy+v9nIykePVQMZKe4+r6E7Ef/xuWGMw8uF/8xKzx5axhDJazeA2Lig2to77Yb+erEufvFXfveP/uEf//Sblk6D/PGlJ/Q2WX/qrbPJxAd8yUedKIcj5b50fTeYf4qZQO/GdfysyAy/1CAw+EtGPHxc5+nZPHy53BSFFyERk3VHX/xnf/AS8ZnukxWh8Yn7//WVXgZx0/d+xRff6UaIaLWxd0J+WQOpezZWfOacv/kcRXh8YYdOevxkvrhceS/03cLY+ku+oUJ0lYefEjp8/L/+8UJMAJDSkc/7to8vCQ+q5+1dwM11AMIr7AwoGP9cwKjx51bDJpo+371cCN0lly+XEpsZHnlUeCcf20pxVTf1UT/waeM8lLw6vgvkJGTCxs+XAsvST1csyn3ZmgeMrZ+97guhO5ajpxR7eL4ksGSt/TSx2/KH/8wn8YCOr80dkL5ICJy/XziT8HwYgEhOL91wseX3HxWe7r55ZhAXN882IJTrMe3qPu7n4VgIBy8T/dBeOtRj8DA12ShlEJVP6uFS/+FwRUC4VU5xy9nGg+T6Ot0J5S858pA776AeHV8zY+JbD2M25QBlny4wULj8DbsmqD2Zmqi49PRTwobxeSO7uZkroQEfPRTtYDYLwsrssrGi1aCEwvGVGSjh0fGCsDw9i8vttlYYlg9PhHp0o6kKCfH4CxIoR+l1DYqXrWi2yFsGROM3JYZJ6dmlR6UbGxMHr30iGHf/rUMfKG5dkpBQ/qxVb/o4Z4hUH36gZqtwGjMovTemQcqt0zWBkVx6jogqx7eeEdx814SpV8kO77ZYeLY02l0cG8KsHs5h7wY1AsvimAdJ0HQFiuzTSUyle+uCoG719R79QEaVOhIz+bBXDhdlwJR3X0gIVusdAdHkSxMeIpT4DaNoeSQRpWc3HrP40iX1rdnqvEWC7FUB1VA9Lwmq2ccvQFjQWcgYpM/Hg6S4tTGMq7WPx9RHG4LKs2/PeoNumhcJB5nThlWT40cekLCbtBiEp2UQucVGhoh8uOnDkD2q4wl2ucB0n/sQ/aEqPnimHLw4taq5q5kQNHbPHQNTNmXG8MELO0Rkfy9qlrR66clke7ceov7t52F5a5rMKlBevATNzOBKIJp32qD0/sgZDOwjP0TQdLwZpH07OxWe9zxhlt1zk9VV3eiQYGOBFOdw75Ywi5XjoKtuzBiyZwcyRMLCwz65etItCQ6XAno6S0xkUWnoALAIzfLmEqL64EHqe5OQMby55wfJKFU7N7kPW5Lv3mKk+sUXYVtcN4l1lNcs9LJV2kAkXL9kofQgRrVPi0EyWQUzl+R3+XbwJPMEjdvrttX/5ImSYMmT3q5zXUCS3abllINvxmWDgb0ohwj2i6hWQPbpfEtOPyWohv6rlpH4fBSwClmpFcsmtwLRARxYF8O+wxCfTTBApFxF2MfhcCtMvP8Cg+rXr5wR0e00ViESnUItLo8KQmp4+9eg9e39BBRWl26AaNmv7FyS3/FWNPpLjBw75zC/6eVGA8AHAq2kUhNM+fiOUxYyu1UQqgs/ROJ9bgfXvNkK1y8KiMjQn9ltTDPW4c68WiazhD2mz8DrD4YgckflAIHcr4Sg+shsAZvTzwjqDlfPnJ0sxw1WgVmyVau5EkbEpT8j2vQPLENAJ0dDROfzaIfQt9uQP1yCdpMW7HnVGhoV7uhQlGLXviaodL/oiHw4DQi8uOYBgmIdCFAGrC/oZmuMjipHQD4/CjUID46gVdzcCEPGnwNzMGuCUBzZAaJVp7JzSaupj93sRYFpOq843LSkAcgXrJTPkoKQko9ece3tG4ZQdlwgAkBIkHijlQtPezEDdBioo3y+Fkw5bFPQxu7oSK6cUpxHAomr9TkV1+4xQWFO5rcNRHB5UWf2S14vrVKi011C4I5DfeVuQdg0cxzrzYllBZI+qVkn6hBE4yhJqCS4HzCEZHZ5q1w2Wm0mk1Eqn/rEu3/9l3/6zbmoBGw3aueSByV1puMEo92WUwoK7mdGAeRsZVVimlx5BsCvXjgqTl+vGQzyI74lLq6e+MB7j4W+vdOJ0kyJm26+9R4mahLz/phhwG7KynTRa8F21DNMKkW6TVbRHYlKFI1zJqAr521Qy7YXYexXdm9MNmy0++NjE0knUyWuLi5ordtExeDI4tjvWmW+tzDis66QUk6PA1YAWVidgm4kCMkmZ1xaXDZWyWkl+zEUlJuzsy4tlcTeJe5HtIga5xEO7eNYWX61PnMm7mFMauInsYYgZ6lKJqxZg9BV2uJCc5FGI7PssBeW7PGXZ5+tC++RK9nejCySxisVnORnOetaXaWwLZ2x1yKbe7lRwHJWQSOJY0PIsHjuyPz4IEZcN7KP9Oitpx9cbbwI3Xlvo+YMouqTNg5uWCHdk5mz0d5hwFqo2NtxCgiHJWtE5Zwhfv8Om2530QjVmUFv3Hnj4sXae4Iy3axblMzHbMeDttF1uztzJjjeDUmtDI5iZqgqlbheMZj8OdgOg6hG6UNPfXP0xfmK8JqdU7WH64dE2Ns1rAm/3sFWH7atHnbHqYpiZlRqZZjqcEZXdSoY2XtZb6b95oI0yk4zVnN88NAR1E8iUv2rg5E8sKT4dlbTQNVZplIvFUh2cHTykBsRr1vuy7ZoowK60R2YQ+kPpXYSDDJVuPdG/sKLouJg7AhgzmqNbCsi6DaCXueFWVH1Fk4+8TqY1Na8NRy/VbVj2x+o4mFwJhouhPWwHx3EBMSrFvoY2w4gWggfjrUVyrXry81uRAck6nQDY8ie9exI+mfMemAnEbbhjEUPUbJbYQijivTloGoFgcLxaR3UiMp7RU9s20vS6rkaUxk3PlA7qh44TfVRxaYaWVLMPOsrAZcN6yM2NoyQ9JwPIlYw1y36IZfrAbjSVcY0HxNwOE1Fj0zhnInmGWsiPzkAY7MA1OEwYoTK9h0+J5IYUTgZU78clVeKsLquTek1saNwOnJ6zMrBVnYRaWY+eEjhj1LS10UsiJi+5FPn1ApFhX5Mmb0ijWtTXWh536ud6Z0ZTWqkZcSqqHXOENxSIY5zQ0DXHJ7xwSV2zhP6qS0K1gNJTyjoclTDnpN9q0ea4GzC3pDu0n0G8GGjUCljBHzePoHEwTq4nKmfd84dqHcWd8QSPykIJBynrIVdoyAok42QdeEEA6FqFUpiw4jV534LnIVJqZqTa7fA7WVjoIbwuFQ74w7qRk1WJ3Brk3QLjlKEtFKoFDBBbgt9kgQGxbAqzEWrxnFBGxdoCFV3IHTdHavFtiyDmm1tCSoGZDOoY/JQMAvWZ/KQ4EEgkktcF5GMbr2V2sF27AmkMgi1BN0rD9r2ypANdpFgmy8E2tjUEXS9EX2iAQ75xsVSySD9pVpmR9Fr1M6mFyUtrn1LUKITsDJ2Z0qAdO7UkdgyxG9Iv2loyFuzQWQje/WmmCGDAoT2cZN1cJCvGAJ2QqMM6SwymIlXx4SGsKyPTVeBZnmFQVQyiPbnumoE0ZqBzW7X6JCw4gVC35gi7eEKjFxaUtcS1gWsjtwggomPlLmgvs7ooPHGipgxWREQ5x2ng7MyMUSSTlWbsOcZkDp9DAlCkpTUc9IwMPqEkk/o7IUO0LVL3owRAyVnFS0lIUx/MGaUgY8VA+c5tGHHBmHSqtNXahpGIY088o3zhT8BpMuJt4H3I6927B4MVLCvE4jJICDtMskCARW1OiQElbi/BVlmCJ71kbPs7ryegPQvttUEU889CM1kbFRI5gmUasDagqwAoaStOiKCScYldSaPcZIleWn+6wNOkNxa75ggZSdjoGrXsAJxDuUiFXVM90JAyVQdKkgQxk5q6uyggmOU5YX4kJ4COLi0GlpAsT9UhnSWaiAuLUDaDZw62Y88AdxEWJniakNQblTVRXsZw9Bukzlhto2nAEk2GrRA110whrOyaAhKnwtGWqGQ+qJXE5CMJCjjP1yAdsZGWzi3CrbayFu2d/VJQP1yzxuAoheVwLZqpFCCfAVCq1oA38+VoTHaFB9+VkCodhAo42xoCE0ud3JD9svtaUDbZzsanzZTz2Dau0YBhxGKW5PQHyelI+DKsjLyyYeFQEqT2OiylZaFSbzYy88/zPQ0VAbb6vRQP+4ZqP7AMU6ScENQ1Vrs9Ll9pQQy5mhNvo4wjQ6GrMs0VgVMysWLz84tF/E04JrpXE7Pj1fCkF2UHY7DuMAgbSXUpyUFSk6MicVDaUOTR0ZXNLj0MJR522D3FPU0oPl8mZyc7LcUblgjvMROMMzaii3IMhBK2RyEjzdqYqpPQ6Mq760FJmmr9dlJ/lTKiUDy61pOTctJZDD1gcVxKAROu576XLoOBCg5WBtvh9GEo/OhVVWuewXj991nBz/LklPRWD81J1ffeorKc4ejgNC+p9Cv+cITSKVkjs5HwYSCo3cSTTxMCR/uPmch07GeCqCX+3hiCFdZJKDoUW5wTlCaSQHQzBq1QzkUa1D8fKEmHD9KWFF4dImTYvAKhjq/iHoyLuvncmrdjRKwmVYUGBi9FiHMcgIXlMzR8NGtDbmLiVNU6W6EUZqtnlkgvaxPB5LOtyeG3UYIiOsdi2PCsQhxnTs7CUPYO/ykEhMzvEj18DASgse9nlloPShOCLK6qPSkYjrwSmArBzHDCjYouiJoWoAwcPZo/tEyMaHKuz1WY05fEt6P3kks4EeLU9J6s4x6Slq8OYDQxPcygW0kwAhVi4CmUTVj4Jw5iI/XYmLs8weWlZhw/xKn9eAZTOPiIZwQ1A8PJ4X4ds1AdpQRfMkhhg7FLAsQitAenXxlKxZEtTe7omU/W+OQLds2yLsnBWlu83hKGKyEgWYdi5KlxIyhk0IUBzgzIWFw/rOnaMLhG685Je7+C4+Ly01iI+HO6ykBw4fqpPJFVALu7gcoc7NJDcSJQyHznYqZqkky+2ktFmR771R1mOzoUmAaOi9gHN4u4mnJaFWfUjluGKg8S1CyWuYCoQuLUW4kMXNZRovy787VhNKn90IV4bxWEP44blvF4XVzWlotRqdUdY6OIejGsOUqcxgJpBD+6NVMU5PQ/PIrO4Xw6IdTJuDSs2tRsFg5K0l7J4a4vjjG05FFrgw8GaCoWCQMQWnCFSIeRMyYJDC5+Ho/Qkz69kVEYIb7G8LLo8KafqFXMMTdQN3J6HYHQuekN7MKabSBlIwYpIzODHFGk9B24xYBTR+ZTYZXPX3pcdp03zWDnq2xYKKLUdRTwXKgBHCu+2Dk5OAV42qhKJuoZppYFSUzVUaAG+/b4bDM/LggvKwnZ3ZcWvUFg5NPt/5ktreNEgCTt9EGvogOg9YhBg3RmYmn2IQOTgwE8up8xCHFj75DGi/aIGytZUWDrmYHPZX0IROGxF83RqgjMHaShigqgTkTVaPi7ecRBrXXVnVIj3sbBeIvvsQQXxoUDnHWr08lLgswunC/tVH1wYYwSSmK2tshUzGKOw8PBJOuPN8dimm99xlpGPWfMWRzzeKhSYeyJbJZc/heRyEOVSUY6tIQRVXZMSWsTstPUwvhYG1ZmB8n7y0LBRquXiUMurbJ4kl9seRt6QgD/OSNjUqWOUyoMsTROAI1S+35o4gRYDrbGEK0/2RFCqV8/QqMrG/AwvhktsOlnwQKF97awGUpsKgKQgzew25gFzh+uxVAQC4nPi8z+MqKNMZRv02B2qnUhHnNbAXqu2NkSNxlCco3DmQ8YnChUTPtZTSLeDxLQbJZz3Iyu+++8Cp2v3zZ4uidqqsBKpPQb4P6eSoMwM0cI9VGPCT4lLcRiG9gzq6KXRTMRyEEku6klDxM/91rTxrD6DYBZ7K8TgPgeiMjW4C4mgYGpw8PGNQ7YENSCyKAiIqVdj0No+rhQCAAYjq3Jw4G778oSGV28UVHwto6aADicWtjtkC2nagEkO0nDEliFjDwHShKgTOi76lptv0gQXGyUpE9mHT2zo0nldLrtsDanctgIWeHoYg+bToBjKofWojIUQUSbOejcA7maRu2B+VpaEHB9R807XdXeevtpSeV2vz886Dtv95VC4irh97og8w9BcKPIgjiriEoZOQRRds5q6xD24w7rjAGcGMf8rFHg6uY6qtvXS+FlEwez3ni2Q0jgsks3Yb+gaN1kWHCpvQQQuVDDGdtWDPdMY64NLIokckP+pQv+ah7bly7rD49steelGr1rb9yPH77kjeBTLKXiajT0chTnK36DJHVUSBAkVGE7rztrJD2Yb2U87LFAK588xd/10/8uLexXSw9qU1uHtrg1eM06O8FqDwNC7q46NQM4rIuQUP5lWICytpWBAGhmfTVOJ3/oU9/a+SHBKhQRAGoczRaexaSpvLa/56Aq8bjyKZlnwLUNkPIf5HaINjaiigUWNyH9frq13zy23ocVhE5eKhpNSF0Kvd7AjGdrRwZ4iyjEHQdYz5XjMp9x1sQhwSLUvMQv/QNn/nADs3JXvk1YlU6z+T3BWL2caNcKv09BTiNCfPKqpRFW0BhgEsTNY+D57/hK5+OrPHbf/gXpFsm46C/LxD7A1EqYDASBsq8AXppFSARfRxYXOLFPASlC3/1SNeanf/8/XPKdHVV4/em4HrVkC06nkFk1GdI8kRtROKYtyA0gkJCWB+445/wtR9XpS1MnvjJVzNlUn64/v0BpLNcufy4UQKg0hKIOQs2QFYx+shZRjHx1nHi077+Y6owltETP/daTGXQ4cGOqsois37mmDTMMlDWZo4RPK3EyHVJv41wOshoW/mmD7l9YiwQW3T7yT98LiXUz9YqZk2EI0E97QQlggymHNlBAjHl3iiQgdHHKYxZO4Xt08ePlBysbf3bP72SEqO/7EdnpeMBlEWrxwGolz2OaCcTBLldsKEbboHNrYCQtTNa5jWsOJjL+r/913wz48i5alLDmhf/UasjAeS+ior0uKAQ26gZBHglNmBtC1xuCSzZjofhaXc8cLDYr9//N4v9kVOZZWaBvv32VlgkzAbQXPQKJQD37jGCaCFig26qL64aBiFuKe0KS2lEmEzfXXnygWeYlcXe1My57dfnNQsgvVmhqHrcCEX5ccQIHHxiIm5QseqSnDyIUZ0w27WaJKym783df5AYVdDhvVqpVj9/mCqNy69FUeyPKSg8ygm682oC7uw4dWmZDSrpwWzVhofpvvHtb3Wsrm0vqJE7e3Y3e9gnLMCmW7Aa3Qwo2LXLFiGL2iioT/QlGaFd0jcrpJNYbAN/989/fS/QhGpWW8Gdr+eT6yRxLPG4JGqk3oLSdnoQGhcwjkahuiBgFPzArH1nRlg//82/+O1zVegOMJf9ZTV78MLCctR1LGieaqGoX0SQ2d4Z2XagzkUET2Ozzp5e2wen7X/4x3cdT3AjMUN8Xfnu0SUkkPrNMbD47pGC3WkJgfQYbWgGASvjLGIUB32jTOPLH3vsh61nz563lUfu7dzz61SKQRlZgO19rSRhuFcGMqOSAXB9FBu4aV2brSUCIto9mzh5N9jIvgC0zl/yEN8EM5zfjH3ov80SZUkGo4JEDtuoDK5VZUAoN1YyGDll3IgJnXX6NrnxWyv6fumS87p2LDKpo5Vzy0ENTHsCR4KiNxWOuHv0YJTuwAFQjwu1MfkkUhY0IkZp25vEO1+8lm0iQDc6QJQzURLqbNQKTnspEGbbc7DKqrdzFCgvC2XgfBQCKPRT2LIbxKwrbIcCEl9LTYoeND1tKS+DhzjI6GjIZ45lMIl2Zw8ThWb3aWRByC+8UoSrPRhN0E8ZMd0bkZ2USTWndcsgxA1vkRmfr2hbk6i5sVaPfGnyxK3XNSyA2++UI+QjbwZ3+yBAXH9aiCNB6I1FGXRyVAaxBw1CrtdqZPY6oorSmiVYy9Og7P2P/XYwrs2/cGZupZNCKsfv/uAPl5WSqO7EU1Ds1nbJ/L4B4PtDl7CIu117BrffRAY2h2MGJPnBGUl3YFhVKccNdgh73cFkQ9tIHz3/T08tZ9jlf355kpDAyaAfKZrLo5i5MEzxfyeFskDXT5kSyPG+FAKSzp7lu5M6jWrDpZoh1ZETlA76sNekX/tUtoDoPv2vT11MlLtp7T/86SIoBWQ4KJwGfVjbQUdDB0Czh3XLkYiO+xWBVhd7x8DRwBEwm3kjiroBazJRyCiJM4OCk9qK9Et26fnTs33FHsWvnhbeUaA5dDlWy2jnBjf/B3H95J1yAFW/7+0Qu0tloLCdIcppmdhIOKuLJskigseRPZy9+bnXp2lr7lJfsXcN2bpxSqF+3FFRzhu1ci77NCgA+NmwJY4kyR5Wzg7LA5SBxy2EH6Zqw3baI83cjHHtgT3h0XBF+qPtSzuKfLUWbVGINL8g0dApzODi2+I3oHwsWgkJ4vGjUuwOK3B2pwyIy43YELdHquxOgmv07Gm9shZ1Uuou9pC7avWlxBEgkbHf4NBcLmGu5YeL34Ty02NgUT9fEmS9ylFkfea703QDY8l6hvUgGAWMSrd7tMY+rXtSn26VAwzRPXu/Bc6w4wSnvbmdi4O+/CZZDkNCAtVe6s2KQQlGLs0iAtY7Z8SlvUgRx92QwPRbMaytHi1IOyuTTjDUxP1jO6GQvlvg3HquakXZs1o+KMh03rBA07cbRWGdc6TXreyhmIjaUHJUN4pK8RKFZDOxhg9yUbepsyGwL+9nRgOSxqaAoVwEWMNdTvBBhKK7OKPBaJiiQrdVBnLrOfbx1FjZyYj0ouTWKEb11BiOXv/Ysy521VgIbnZnuWgwtdY1w6pBo1aEbsSfCftu68xxAHF56UFIuqBEt6D+tRnkYpWPrKKINihEbW+Mne9vSDfH1bYwjsPZiWMFHI8XXkDO9zfOTMpTdwPZd+vIoukwdiC6jBx+Jv1B1kdYR4dOUWlToDgYwFbjXvmItLVPUiGF3HuQiQIyYf4CJbpawxzJQ38D+IeBY4GGOgmEcFsoRXLt0V/crsXsvGTUcONaUIhT2sL184W2yrDBpDKoPXNGgZidGxYM3HYINZPT5CZa3x+iI0HcL1nQ/AjG4B42e9BNJxqJmzX0mJ0rQrMbGRMfLwtlyWmdSWn4halVwDbrbTYg3V41ZoRFJzeAbAfaYtGdkSkgtJwHCtlMTX/SXDdGbOttq0YGN7jtni1ceb4g1cyH5zlpDcbvxIwj4vrVjYCKqwzmZnFhbgLMxyEhAQ86hN3eRgaWasr9IT5UVlw5T7RAaguY1iJjmsO1LpO9kxs1bN47dCqS9HaNQRxuohm1z5ubxcEYwhLMhsSI4lPPQCFZJ+gPszzYEEePalqClJYo6noMS5E9eCG6guNDR4qPvhGxAuJ89RIU9huYs7lf3UyLcUgcB5nyjDwidOrIwOZhFvoL24Na2f2aUcJZuEEBtcwUGux7z4oEO2+FRlP2tbIKivk/PAblSM2IZs3NIIcnERJy1YG3gLgqwQg+ral/PcyiEVGnZbWMqEBR294UnjsS0hS8cuJJMx/GCStgm65uMXK8qcUszDdyMzSPt3AkFJ4M2d+drOaBgeiw5v5k36msTGMWKnHTzz0KWZumJKcLbzUheDdlXRXbI42c7fw3Q1DflokZN9fZDoi9IjgSE85zB9j0Obg5tP1pM66tOJ6XdMBOl4Rmr5aZMqlsSLMEF08N6bbLVsAKyJQ+8gIJg30wI3uS74Kid2yREFV28+LONJ9wUHXm+0OYlVbkJnUdVIwE5rcb3hJ5fVWognuhzMpo02yp4FA+9hDZ7oXgsNpJliNxJOx6nTXfWZxWyoD0qt4D+ju1MvMDq8O1hGa21oKlyYdfkmaR+iOWlBuiXVLByb+tBaHHcbSjgxnvgjB5gHAQBYOx4TtCeDxy4OhgDzoeRSsaPAh0JIkwCOlyVw2R8fVSFUuvLpD6YrkXGAXE5Q+uIHH/WBFMrrETIXlaGyVAujDQnLS3pCDqWvSHZdebJXspK2CqsBBY4tWEhrjzS6Xy6+dK+kL/OxUozsOiVgPEbqFmKNeCncgv1561RItzPidMh0EZMJ7vI8xqtbLDPmk0dQ9DVoOl7qEuHbxwRPRp8+ONMABf3KcwndWw94u8B/BJ22nxycm25qP5LDiK5szvIc5yWPP4mWMFtrkgeNqmIVyeLEG9/eIYtjDe39Qc54upWsh0p3Zmc8C7EeXHFacEbJ1tay6Iy0oZKDnJ9jGc2tWephpM5RbXr1kSDu2GKllKXSHWP95ROOfHpcmk7+3s8hR9UGc3Ey1uaWWQT93dcdh5tQcd3IgVhXtVDVG6EAZJ25Roeu2Z2D5bRhG1/nihDHDJZGWhu9vKjurH0otr92PWAUm217Jc0JlBGVCP94DNVS1mw7lTkFc2QuBYaxnC2X5B1CsXUND+IHKc10MLNINUzWDXjD6ovDcUJdD6WivsIzmsFZTtyT6aaa5WVL2nQHpWCKzaiGCn6bW9JkYvHirK+q6igNNuY6HLTMzIHjfSi0uOK6wE6l8ZhB40nQoF6kvL/cXpxoyj89TAeLiGwbcTQ1xfRFVnoVSUqpMqRRIe1mqA1drZyfG6H+LmIbMS+KVFQQ9Ft6Sg7DylPSzGMA8fjhyKuXeFK7dSQ8LmJak6G0pR4t0QnJoOTGYjJZheO/RCvtVKWAmCi+l2N1SPGw4zS9GfHnpiZmfnIaNs9XNctpqpGVxurTRp8uTxwkj3dVSK9nu30eIwEzWDP3bUc/x8x2hhd049xulcKWQ25v5Qj6NacXxRJrCU6jcEX60o7Bhmogk7Fyoo7P6+AaNzZ7/KFNDsA+xl5kNPZjjIWAn8vN7uhmwFSu4uZQ/V7V7M+M25AZl2uoLF5SWYyTJmVbqiQXFCfyMMSPR2GQFhVtqBNg33RK46jEQJm6t0u1sxFwokDx36a26HwYpofB6BaG/hYbpq0Q7TvibN6cJRFKjb5RAcOx4x3dgRz8fSF4U7e0YJzPj8He+UdRphILuxe4jLflQrTudlkJ1+ICjBcSBmSNi40cRkbrpAsrmKyuBQ/rIAyLinaoZu0h/HjyqGdcCvi7BTeXtQChln1L/mAw8zdzYDufZnMOcPKezM6mthPX5zaaxAKO88BaA/PgJ024NdyKcWfZErzyOjg5A8bswOGgYLocCikz34i0KsSEZHDmKS1jXBj3tDuBEJ6WU6V3EFcn5RcrjWxR6AeqbOzAWY7dwZ87gfKwGx2Yp3B9muOYCPdnJn0E/HdhKmqxyGbUUrmKx50lOqGSuS/loZBdYw2XJw4o4lBlSjSswYTsxt3hlRMG85JZDkzKruTstppNDk43G8O5k81mYIw/n+UJpcwLg0pQh3M1HkdxbDIiHOZoHCBTfVCFh312omnFxdBlBjWtcCbizs7KHuijA4vL5vAPlTpWbA1vZQup96FLl2RA8245QU64WOK5RkSw7g6EAAsduLZmDl0gIDKJtXWAk0We7qbhBv64QBGNxXd6fNm7UdS0cWhxHvXhMsq81Aj2ivpClZnUKhnd8ryUzCAD0+idiV2nOCSEd7Gy2Ma2vBrmSZC4NDdpXeHVx3CXMJKvOeuXE2W8K0u10hPdNhyIqiRllYJA3LwCHTQCBMQmImQXCGkMZNc0MC6GyNu1ptIwOcu9wAdDEUM0hZmz6/VlLApDYo6cFZ05LiVs2h0BomXigwGRq+O5W5VzO48UUIcbybtGj6q4N0F3ExDBSaXAwALrs+EkhlMc0t6lx7mNZDUSTPjSKt9VBwmRbgrFYMAUPvGO1Q3saQ35m3lQSuudbm1fR4lSsFXt8AtLqa2sHNtAe5ZYdLXLZ12JIoYkWou6JhWShHuWwRMlmLnaAOMsE8thwJdXOhv4vmNgVl6/aS7w4ynBFIuVKPmNNoIARPz01DEWdIL3lxqmgxK0mCMUboIVU7hoPIQIjKT6IkQG+95q4CjAoObO4FgM2ttwMm6i3kawaM085K1RJrjR5EFyeKhoIFATNAslVQMwlKOYH5cQLeZL3mruL2qTI4+A4BdfezrdhJOd3QXDgaXBLcNzuhIeKM6JHuZlg019Qs6gWAqlM6M0ilziAqewrHknbOZf436X4TGeDQcQCUdyMCBBOIJQ+pDte4rBUGhrAqNmMUXUMEZ+YJqf4hBWPFouK6pzRw7bXI/abjOFBovIPo+iEQYHp6g3mYdkz4ZGUKljAZPaiPFQ4tR5IMPCPkfid2gQwYhfA4CU5JwFr/N7n8KaOAdgIEjj9rBCfBjI+5N+b7H+PYmg0tkYJED7eninfWdhxRbyMA6HKvdiwdOhj8YOngSLS//G+/Qf3kyIFFzojmeksAjM1sI4fK+TVOa1vOlI1oWryueM9fJRw7KhDkR9hLcJwwDMdhaCkJ2Pv3LyQAoJuUwum+TsjQu/GCk+C6XsY92X62UdBMxRJaF3qYbk4XLnn/JTjbIgQtFt4OmOYKKO0OyCgBvu4rpt1lnQ5HAdipQWRZbYFQ9cWT8d7ufyAwJhcmYan6CFodXEgKx+2UdeQtwlbdnECaZauA3UmV1dz4gx9bAYDmNkazU2MEUXysBED2zFa2B5NeXBNcGsvOFPENUdzWwpleyajQ8gyj4W7FUOlqIFfft1ZL6Y4f+cgSgPYFPxrx1GLoXqCQ5fOtPSQXdoNjvQdbq1xpkMYsnBsFomP9DgY6mjHk+6EG4slOKEow9vHf/QEh0L/kOQqihzEjZDWtKBCfPJntiivPFwJjtli2RfNMaNjrFY5d27EGjYsPUPulqhmi3YRVRNNOwEqk+nnff4cga6cjAc6rBkFFvhQKNi603W7Cw7wgfHRq0hZUBx7s9LRwQc2SimbyjmBcvhSYC3djUimVvZYWuGNf8j03BuykGEnZqWPk9kKUAdTzPe6i/eBWcNLeCq1ZBWVhN0LhKm0lxeacsJqNamcG7mY6iBvHJVECue47vnNa24MRycoMods3Hpza26RexdxveAW6AbFFw6rh6acsmu3sGB2H5gyEOM6UYNSzOijpTwqjBJj6vp++pzfgSDBtWwj7T7ok9P2ZslzGdHpxS3jVJ2+Asc2ycSzoeRTd9atKts8dKqxyENZ3YyUm2a2xFhe+37f8/BdNykggOggg5G9/IRwAKjcdcwJj9977jihg9+S40BTFoubxLFzYS3XI8nNAS3pgSMZaiIO5tUoAd/yLv+uoGwlxJzFDePPrfWQpHbrn3tuOmN3nn3pS6NejEMbqplQah8LH+45Uxv7nzfQwUzt2ndQoIWqMcjMqwNhkiNF0+3UDoeptT1nEHf30r/umuLPwpJDZy0fEnDzwlEMWrXFsWYP4wSszHO+9HZl6JlrYHo2j0RHBqLabFuOHH3kWAOGJL18VpLP3WtUcV9YJi0wFrmDheNeQRldPz+2Kh0bspNsitZIP+qMzupxUDEaP31hGHriQlCaLrRD2lJFmvMyC2X6FNag0VduuGhRqx+2BYS1kqwekOWk3wMC/flsRjW739fHAHM0OqiSYHHcFK80SFQjLs5ZdXJcEVN4NSa9Lu96caJwwJq6+spTfO9xYcrA33wpIZbIqxeKdC0sq66d3nZ2kaSRIR7Ei4lU6McZOcwLH71+F3zvZfAR7Xb0Rx1IpmtnfY1aR9dogDJ6rHbtKpInNRS26ELdiFCXf/sIpw8Zs2ak56rcBrC6VuNzoM9KZL1oM9tCrGZlaWROF6WWuDFVKjOIXXzXW5qUdgcFaeKVpKO6kvdChuU8YeC/Anttt1kRmcpgFXRotGLWf91hUYePpSVgcswakJp36uNqVjQqNG3UMwTSonWR90u1ma2ZVKjuOUXz+NRkUoX8pFpNwyFlIVmlUPFiTjnr0LoWplLDnpKMMxbMFNJF8GBG8+6JHrIh2n5iBybrZO5qjPK75JzqSdNoC5yyoXdR3RhVJtdlCEQqGqcDM+qugB9OX+oFJ6tZzYaFxEpOtHd7oiMdjQsG+7+0k3M1JOY8XRhHmasIwZJ9/alkL3XiwCpt1P+MpfUyuXSt0YBXA6Z+qxMyE07ZRBjkbeahBtpziyCy/INeC9ScOO6NwnAWW0LYckdl/ISoUvRckxbhSM7KdoVVGlJ3PWA+ptgmP8Pg81UEGL845GK3VIrJQNTYRxU+uSUfovyThdQXCbKyPDo9KPag+IoYRtV+4YhUq514owWwpamVJ1zaeoDte6XDV9pxlvBE7w02jz1WLrRpSPYhIoVytnQYcf9uMsytmNUjh1mVEo9tCB/o+ITHLudqRbVt95E6OASVMOi6xAkovTuJj4mcOBTBsfVQSkkkeDUqHC69C8OmXQCq7SVAzscOE9Un6IBUlyHQT0sj1aRddut1VB8s3Mxo0VTz1gZBKVz983ikHVzNvx2Zc3QKi+rgULfISayAuHhjERGW3Hiksl8MAPE000gs8q5B88xKkHHZ1YkbcbLstYBwdp0rYNCeleWc5GgJ6ftXDds36ykKjOUeC6vhzIR2rqk0ju0LtbN7fBgr5egSoIKUeK7HjT0o0Opg92wlhvZ96ZSmOLSI57W1IZ+y/Slggi7WzQzq2MRAVqzaowMnEKEEwGZ4IpQhMV5+anRTYH9+LWeJ2QNuZLpyQhO77jgarmRJIG4n46wQaSNizrASof8yNociIkb525slQsB9u7uUsrpWarZAJjsohx8eX4N3PoWZkVmkcxPNjYQXY1QI96dSH3jQuMlL0naVH50Lsi35x0GEJhk3ayuZeIjjDfH1GVO4D7HmVR0JYZUYBb+uxHoGUb7ohkNEhWs8/vj4ZyP4gy96Yxe7Mt2OzAEscP3dE1SQ4OxoXiKU8ayU+4zpl0kw3dXg6kBEghYOLz70SzJQE+2ZzyuLzY7sVvTwBp+46Z+DVelQIQRUNYXJZx0em2bKaoD1/qFIOAsowKMpBY3nhbFhxgv3ThEcsHE+t2QIZvgDLpJsQIY6XSuCraMhN5k6Bat+pAuN2oysVOJGcSCaDztL8amc6xD57cy4swbDM+mS3f5WQhH4Cqs2AoZiaaCCjM0FsnGoDtLt4erNbrToGIoBchQComqWt2ZOzPcE+/NkJC9nJyOoL96HlOKSZPqNCMSFAtk6jIeSPc47Otq02AJJdOPnUY2c/+Pbj5dJYyQmoPvFxf3txfrWl10+POezD/nYYWFz3YaQv9t8DaTJatriqdbQjs6kRDXF3jtjIZGYLwCzubK0fOjozXhofr5SoST+KYq0cPVQJHfZpLnYaFg4PQnWS5y9YZCLg9pOodjyvQzxE7chHVw224XLNHAVOJACEGQkn2Nclr5SEzCg22qr959qOQ+vHz3Op76ViF9oOMfHJwiEu7iW8JVcUABQAQhD7fLHYgtVOW9p0vXoFUt3fP+NCGK0JqKg5Jmo2c4nLNCt2m95YvpyqklB3aJWFHc5o5hXIdTsJdvANISbTLG2Iihs1/v/C5SSC1GSjmHVt8ueJ41D51d+whWwe7Sg5FIralOfMMVGa/b9hswgsHF/USLWO0HbgjPtPXrIhbBnSmY+L5XIhMXGY2/8v+FHlWNxFn1XVixdn4FQZVC2+WaN2ZuIRFQU5yiUiMgf8vsDHpZIA7fuJMn1aTUhr9Nq0jJwMKwJpssgI1azheCCr7L1hPlYh0eThiUj8x62AlbDzehmjNzk6O3i/jYx4PHfxkF2V7wuyvIsJiUvqsSe6KSVMOpmuJKXcZAi7LNpRXnBs5MYbjgY0bxQCEUAAHQQUgiBUPew/SSMJkEy3NLL676rVgs7rEy4vV63mpkUmdlyNKX5/MSWcCNF4hPjwGcUYcc5Z762xIoE4Jw70qj6LO6cjD93qm7nyzDuOpbj1GWnl5rLkhvHDueG4JEA+5fjYXWfmVFAfxAICQMGwSOKzLLcubaquapomzdLMCIs4BwYkoerj+l/8zOd30h8bcuIUnmRh4moqNK6+UZabm3ooWvwZAXNLM8+cNB/VdpQtCdER6qU/leALvj0ICAhEBCJ2aVVVWdbNDscHTZ56YWEWEmKAAAqOFOyS+qW//Pc/VfbEYpL24MiRctysr1/s02kxUNxFFufkolId8jKpMWvpnBrDEFOf5dV0U7VzU0sKyLKAOw2y6e0QCjGLsXnetOMuT/OuberUGOOcEWYQiED7ddnsy2fSiyvfezTN1+Uw0DTZOv364+cjLcbx5/tIAsTBWlTwssgtk1Kd67thUD3zgfR2MA9m4hAfhfT0ZKSSfYgQEgaVSqlSbUajOq1Gk7YtvLMQBkAIRAS6pZBp2wfXTx63P116oUAI7xsvvePBi/0iaH0942lpj+SqXGLSWj93nQwDqsh7urUjqRINCNWD6okc2J4goSuVSqWJw8dOHJ4pl8MmL6wRAQeiACIC3XpJRj1w/JVHNyRe6MoEfO2Rf3i6Rz6ETTewuOTFTaNiGXQC0hpXi2MoZpqpHTKvAuFygxPp0n4kH5+54dZbjk9Vwoi4PBACAihmpE0PZvasIGKm71r9K7/z1uQENH1TssCdd1MN/rNuwnpeVzBkYV75OqoVUOSkY3GbB3cKGNV9IPuavz0q3WYvTpJMr6ThllPu4dFHQv93TeZ///4TQPMmVRa0w4xxQtWOJa1Svp4ZVv75JDgrkroyOsi615wCuGv6MFe/+PWpEtYyO+zEycnVXUDTM7+qyif3Pc/i3LNeoGA5CFhNmE7GihKHuZqhnEAH+OFCToBCNkIP6dvHBQwOkN1c1lzcCahPTcsTmP/0yAL3blZmlOdGhUlt8eYDKYqf7GCXLBk6oOxNo+ND1nIP2TMPi4iYdq8Ea7pb9t+MPJ2Wr+c8bYxhy3Iv0BMmr89RVF0tnJ2dGS2wvcjO+YIrwm6cLqEUYbe88HcETF8v6aD33cgC9+qpYwzMOBXSKv42usKgyGCPQwlacNrpFOrYJNiNLhRoLKTuyY2FyP3GD3qpzlGjZWfEWsg98raEwzD/MSwVPPOnA8Sbr6Idjyy0IHajBmsjUwp2A2GywmPPFKe5le/maYy8r+071sIL969jmFf/UIOX/lUU2OUThspu1SATDZzR5g7sbuJTm0AvexJVyc0dP3ZOOWri6zmp7T77qMvPr//+MhJh+2xZGI2Ww1rMQuJYDyriXskqM52jnZk2bXL0uiemmeaG6m0L6cjRyoyIlUAb7+pkuS0++MiCOHt2XFBgv6jVDN5BETL9Ydkrq1zYCfHFjFBImXFP6MWS39jNjbaO3OZqYrQQ42eeyktWNy8KItbae6sosmQV7ItSFUr7LTGqpEm5h/MpSWHJQzttn18wE/Ux8rJMq0YLfPO9PZ8P31zekmJGj9zoirXd23FZ68JBo+VVcZlit2S5L0phb82zUW4CEgWU9diwFuDVF3u52MXNymvKNp6uoli7WTALSSmqEMfHsdUEsbS7brczqxA15d4679rwedHvVIIivByEeth8fFtzsFHBQoo5eGHGFSx9UjN2rdGFTGUQsSKyFrv5i+eSDPoo/d6gjz8dMSfEixOuALSKqiFrgTQ32twLU1bNDGnW1ddCFLx+DGpFrhFl2FTymPWwTWl3bT3VG5O2KuKzHHz9f04q82F7waGI/uNqqgfJ6my6B7HtupBqdp6ZkKKFYQnrYEptSOywYfUEV/NuSE/ukJqqCcTB+bg9v6F7g3/6nzeQb3wmkkLQDSVGD/odlnYVDs7annVlL68KCretxIrJW22Is1ZTD3xFPerc/Bc4jkrgoP9HNIYQ62y5fH55ZTbNATvv/PeG5940Pf9KBcUsPnEZ61EHCd0VmKPK7KAdkm5tPDmJwutyZwbygDZkklnutZCt0AMuvev717kBCCAKAYF5FQroQIBymQAgRZ0CUEAVKk5CCI2vm9gU+/16fUyXi812ROSqF/7039YT3YsfzD4xg4LKzaph9EAq1buPV8IwqFSGT985qlnSzeTxkitenE+iGgXyEtQh4ol1WrjrQwf/+Itf/pHDPHXCTEQUIIRQAAgBFQBCXJmEh0aNPsQQYp1nx/1ytdmtU1+VRR0AwDklcs5Wf+nvVlN1uyB98/n3lVHY4jKJFQHhh33Rh912yx2f+I2f/4kTS9qzpccrKL7mo2BFnBjSl22vFWiRjrEb0P3nPyqrcnw4nbR1lnvLgTiRywAoSVVPTZN4EEeDQb+3cyyqsqgaCTH6JsYQJEBVIdD/A4/8tf6nP/Nwe0rkCiR2Xn+Xjklx5OY/UtFEznzSr/3H297zqEzM2rT7jkPOApnVzghUeIWITDcKREUwB5b70E/8Nxhi3QcyI4ATAKBAnYIKwqtmmc8yzVIvAhFVCKBgZ+NdP/LjH/oBN04Golln9cxJTgmKXHxEkVEEF1RvvOcD7ossk/rOM+0xWKiLfQ4JUk1TiyRqdwyrcNMlvAGU8aN3fcjt0843ll5bbEYouDl7eqsiThbzd6TjfB3DSzKLiLKdXDQ4N11+I3B5qTQmPk08DMR56/YBO732pCNXL6TDYpUJTTJ2EFsFkMmyvEEwNbmYOPsWqxJadNaGhgoi2Bx2h+I1TIxdg8jJSVXMW42FtEg2o6GVkdAm5krJGQWlENegvj4W2iYYJYbUTFfaw5IQKayWTsniGIZyDUJSnfBimbthDFKTenZZh0QR2hW3WhYmLsA1aVZ1oFkSyA1bRcC552IOB1tOzCIud6swuFCuScT3IidWhZPqSNWdB0+RQ6AOXrgOhruou4FJgGtThoONWGkRieokdPWv/ObjXS990TcexphlZLMqM8Yn5LUJwObCSp/2MG5GcMag/d5f+7/lqTcBO5Fpd+mFXgmmc9HNQr4rpUY7S4+uXrMgufj6K+t90hbGrXZfYS07D/7Yz37DR3JnGIE/IIBUpunao+fLAuOFS3XnRfZAUVWfJpeeffb5+RjXrr7x4AOnegOlHVRcWh3AYtb/r728/+bRIhOAaUvvwHR79tX5aLIksD+2twvvRAhACFFVz0F97vT86spWnGa4ppX+M3/71q2MZqB5phbSJPiYJR1Npk2W5Z7Dxz/60Thyh45WA+yLhv/9279167GpEoSaxN1mo9butmu1xiBLFNe8mrTOvPUfH1sZF2dAuvnc+S5hOphhDIi2nw5jgWD/9Jd/9YeTE+VQQK/ZYBCnqaoS18oarT/xn38ZBQgdpEhMW7MPvtbKcK0qS1zbZ+3Zp56d7aYpLpdR4ZUIgD7prL369pcupsSb2AiSLe596NHmMGEA2JcCpFwBUGF/+fSLzRBvfjPbJOnuvzzbLAoHQkAABd5N1Ymv+4M4Ui8ks/7mytnsaNXJm2BEHAhJUY+Wy9FsPWtTZwRMhBuoSp1tltPZKlaKpwc1c9XD5cDhzXXAu2KymB0Uo1E3KlNnwEgS1VjuZr1Ob7pMq4lKxZWcE4hA8CY8KBARhF3ejkejUZG4dvss8fvxYLTc1VEVu+ebcTdGABGHkIgDoHCC35sAVlA4IDIoAADwvgCdASoiAjYBPjEYikMiIaEUKk1IIAMEs7d+LFoLcDSBYgGmYwb/GvwP/QD+H/dGadLBOf1H/x/2j/Bes7N/qCg2NHz49k+WF4h+cf8H7zvoz6Av1T7AH8K/oP/C/wnWA/nH+t9QH8K/lv/i/r/uz/8v1S/sf+wH9z+QD9Of+92An9N/4////+fwAfwb+m/ff8bX/i/z/wKftZ/6/9t8AX8O/of+5/Pz/j/QB6of8A/6H//9wn+Af0n79fon6a/2b8Tv0w+jXeX98/Jn9VPMn9a/jvyG/YDTc/jn2e/T/4T93Pyv9q3wd4Av4v/M/8z9tvwD9oO2OzH/S+gF6O/If8j/bP8N+1POn+O/3v/oe4B/Ev5X/gf7J+93MDfafUB/g/82/yH9t/en+4fSn/af6//L/kz7Nfy//Pf9//Nfuz9AP8M/l/+g/t/+L/9f+Q/////+7P12/vR7Af6bf6385DPPiFmekfBmbUzD8Onuuf+JsqBl5wpd++fpMiaol9SQuDvnfGYHe1kYVB6JTbETxhmIBPdDtnY0ihBOLh9IXAOTfpyQcLOpyK/f5g2IrRryJmhGzPR/A226S6koSs8Y8sVL52B1r4hSi4wBfO7jPQuzSnGGeacqpvzC8njz2F3Fsj+sQou5wGNiXwSkXB0RH9S8nBn4SIWXyjcYy0Qc2cPHI4Ky0pphQ0fGBAbJNNUNlMdm1lRYVH2iUNiB4kvelLa4K/jibBmnNNiJ1vbX3NC5o6C8uEqP+4Vx4YKFD9OI64fCo0VuDGDuYyTsDF3Tm6Ccle+fJ6t2UyfYdXwso0GhXoKHW01uBKOdDuxQf0nhTb7SqDQB9Nj8SlC+jrM7vi6ulJ9MYlyFPBn0thD8u54eAuG3R3MuXyyErGEiIz5s0XbKhlr/9d/953DJaHeQdpnesNLAHwaVlQA44MbfH/IgKe8k7BZ3yJS43AqUY9j3wpVY/QLWL7pGv4DqAXK7AYWLEUp27KD7ZFFIh83jaeOCj834RUieqBZ+AltQpmiuQ077AKk7uWhK/2Yk+AmdPp/JbGLzqG4rvRADPH1rboV0+ZoiX5iWlPzJv5uWQFF95ySAkwbDniz7CJ+VFVIaRdqx1B2+n0zb1oFU9ripXmUfWZ2HqJfrW/YMXrfRFEh0lTbLhCI/E0eQbQfx2JFk1bFKfiKgdgKM57MX6cuZyKdosOCYbFSOWVDwtLX1CdHrAi1vDeg4hOKwGqpnaHAeqATzGVvDz2D5nzWfoYfZnquaEXJ3cj8mtGtLafoQwuGJ+6OQsTZOQkYA+UYLUlyWb7zvXgAcOSMZ+/Zxm7gG/pdSTV2bxMJvprSMBiJjxuPGQkYIq0EMCxLJBLYkbaDMUpYlZstVp5NbtPBI89WkPIZSXhm/6EgZ3OOYqWY1+MgaS8ZSHmwViKkl+eg5ial8XanijLyLFXLBLa2lWbhxRupT7uSk6PGOjZ67edEcMFShLsIkARpllfsWZl892I5lT3n/YFWFFV09Qnuydu8qq1Rt/2QCF6W8jelxma6u94LNAKBqXs+QZ2ta4sqrVJor3vVkG/5yTykaYmZZsMkQqbmO07KeJi1lJhIJIxmUopzGQ5mHvPvBiZZRHjMG9Me7iGROTnFj4WCuBzud8fSzQ7cnmSQaudAZjOzuTYttqWJuIwUbFTcBL1jM+LhcaX6c1WIoHCEx/TPFWshpq7apFrRy3OVV+6tOhK//KHCjuO4ZDg6KiMvopZdOalyKxJH0pTCNnLrpCDQrfkcRq9EbJDxF13kSYl18Zri18QQeLUk2JUQOuwvSQeLCce1Fk6SmtGFB4Zx5CdP3GAjlzvYt9WVXBY87eTA/koT3a2FerhqQ6alSaOrVDYa7uKCMgCVeRaENKlsyWcIISQbkntPaeZrOm8k+wQJX6oxDApJlp0TQH5h7+T1OGh7DGvf0QhNOO5u5y9jZt2sjrWMrjnLYdAjWWDaGz2L4Ax/178Vc+Gk8bxAmRNjZ+xwo4mOhu8HvvTCoVa+IWZ6R77rL+YFSXrYagTP0TmN+8+EnCM44kqAA/l7aALj8HhKOEW65E5vQ5etjEpmPxD4TuYcEqJcvRt4N4I3xIycbuQgqcTB5kEMgP3py3SPZmm8mXydp3sTW6vvMDdfGCzK+TgAtU0P1aByG+AUKO0AGKRtYQsojG0nCoBx50D0pVLkJUD9Mb01tV3kyVShEZnzllwhBdkvNrGavy6sz3/92euBEB1XuG9wuP0tNnfA6DfyvIw6fpU65PtaOqYCKK5iEWSiHietGMZ5Pyq7PwqnnbDCLWjqm/XJ0sqJXLsvWWunfPjl7cWTxFppISvP37KfQAqqjvrBfXe9V+06w5OSXm7Wwfc0H83sUqgojhJSLIA9Upmb7G40RAMcj28rfAOv2cRg9GlMdLo6jBCKJLAChW4SCTO2dwr9BQ5nkzVrW2irImWS8lf/XWU2mrY3kkYiqn6fbLZPnWJUz5j+xuvV9U8scUkgrdLwM63GelQYGR9ksnbex0OTt3gkZ874jHF7Eh7SftAm6jgPty55sSjaxB/zPFX2Q/1rER9nsg2Yy/eDXsQIEYdC0/MIilJ/WTVcrWrRjvdBx5j5MiBn8Y5+5gp9DCK1iV7EOsilHijRgnBJ+L6BTDeielnDKA5UciHKPuJLzxcBKLKWw6SqaUvUCJlls5Ww1YEFQRM5e/nYiImFXoo3Qz2//1sxQQCIMM9MLM25KMYYkjwRqBl+C6vaa2MZF73LTTPAUXc0PPcjcsDebh3gpr/n6XmKJ7J36YcCPGjw6BFh0XwECaHObCab7EjmY/SEqmonll7WsYL3/sOYnQGp0rW++iXY2UMhX2BvqxLZwQB6xjUCzGYBFYaVs5t7eq9k0ikVSXU+eHyVv/TeuiZqajU/HCjrHArdnzb4O2RYVaRf+MVLRltKna4QU8YjEh02SVHswPdzv8u4KKykLY7brZXrlhjdQcxlwKm3aamULhEu7OFY/pZw4XcC+VXDIh2P2BF88jPEMzoGAhsq2DybYKhTKJtXocEAesY9apoK3EBr77AaI8G09loL2oagjVLASuhYxR+9HZHAmo5tmYf6OB2QFjWevnLFLvc94BvcJiQFLyPYsCRA5TLwuvPL4Bnq7T7cV/Q/QwyAoJG6stjLy84WFDZmf5Zu8/5i+DcFgiBeaOD8zCJU4IZfgur2mkSzHpM7FrAX+ZPmH6nvjGCfx1XulxGy9MN3wE3aadchPZwxAMTYVC0me8umrBVwX9A+hIGmOKTENk+a/ndRSe3WIgla/y4PyETg2eDL3CNV+2hWCYgUecTPzRZkEswlM19qs5Hzjv/iPatsuQq6gKeUSGzo4af1KeO2rdu0pcY1jgglL1ofraggiHlLFuxQh2itDyxSOFw2cSYSkmDHXaA/JbrCU0YX+K6PXYweqZ8221lezc1ruGaADu1rfmW59FUisiyavkR+dFyIa4eyeYC+bThhoiLRjjH2oX/DkTcZ91tDrto75xEX1wLj125FEqnIOzFZznRdDR8matlCThJL/swVxGjsdz+hze4R6EAvwkz4GqrxXGRJskiDLCMA/+JOyoGBf5pTRrRb2bZoAEtTwiPCsOh6a42phFo51iJUCkdvMmjfBW1G6TBPvOWYE9OIN6xiRKgwywgseG/D2xh2CCBv3pyIPS+C/V7pR1Mvfe6qvwomR5q3gmsLBLYteBt8KLv2yEqC6pY3a6PvY3urbODraQOpBSSnJZquUsLf8xRD8smsdYgH8vyq9CQc31z9gjOgA4GOsvv5txUasafyUb5vWQamunlVbj1EoeBUtn1FOrwlYdZdGKX9FlZgTND4Hh3AW/K1wUntCx/K1995PmngzlOw9LD8E8JtKBUuxlfqBepo2n9UKVWw9fX+ji0godPhTmN0lRihmegUk8oK+Hni+b9MAR9g7VbKcELMRYW4Zik3AKZoZ0hwkgzPFxJTRTnl1IN/mAhY8VThdXhtIwpcfqUO3fu/JMKFeM06qFUsOcJ6HBYQLdYugJZUVvd0UtOs5U7c10i1qcYY9zjNXeLZrHL2YMQneLqRJPWaHMdGahlQxIWiBhMsI2Ui2zMFCfOW9kOZG1oLm0SKfvWJnvULJrECs/nzG++HErCwQYUxL78hcgAzKjQHDOFSVBiYEl2r7EM6KpILGVv+QDnBxv4CpC97LOrX89Mu4b3dDCm+9goqpZsHSSw/qMpWj3anvVUyNY5pLH8Wap6UT4h4LoZBRAOhlkyWiIMiG/skR2Xx9rTXtBOVn0a2weIlBF4nbzXUyKt8kJUuEoHWAwRTemqW7aV/ioRATWTjJm7NcpntNnyX3uEsdgg3O0rjrhVzP+0hkPXVJrHtVdHUSvbmbJp+dZ4b2KVGN2V/JsbbF36p7fX1ePxevFYwq6ZYy6hhy6tQiV3ANdd0Rr+LHqQq67yrwJf9Mpxmre5gEC0vWmMrgANYXz+IOZKX557mNQXGKzsw+hm16TBm/dzGgH/tBoutNB+Xhd91X/fKBXhP6dRwvf5iV1jUvEqux3xj13Ab3M+2clGZJ1mXXwbSv12YhhfkZuEmekSC7uDUdCHAAh6b/1m+z964l2rD/RGHPWCoziA+AKpNuuj1nUVrpfEW5dRzi6TnMucieOE1IDe79a9kHMmZstBEsSoAesMazJjrax/Sn1w7Wx5kcWqDSN1Wp1EaVqrzov8xGw+EMjhDXeAok9DKP4D4rj2HpbZUNtaAHUCHWFmdVpFSc9Ct0Pq5HrxOt6AwjdvbTSq3Di/dgls8DauELog9yRfovHcxmGH4j9iWHCBL+jn5Hsc59xksfi+fpReosgUqDkoUqVRmqKohkeP4MsX6/OaRO657/kAzfmwp6i69ISF4RLo4cJOPy6IeBMtICXU052/XUccp27MrZUAJbQwFdjK32DEfqsizR0rqa/HAI/h4pDTM9xy8cr+o9P+SVozhOLwC6l5rzkkuxDev6Gxnp3nbQRHtFsJz5MYbV0C+wmuSgAb0ycz/dAEH+uiUR37/MpuYQhFCZyTUSZ15VcQSzXAdZmYo4Ve7QkMTLyHo62rqYb20xKzuekm/PuRK56636MkrE9k5rcAR8R9TFI9FEpH1YjOGu0KmRG9/qdW1TlMNCFmuasf1KXoCzpcexx2OLgcveeFdKceYbUyqKb52VtIfeZ0eaaYlyAplT4HuHNQOdDUrAyE1zuwXRGzvicWChcaBExZPAZLfUrJKA+S1JP6929CbfUxQrv4BPCij7EdsQpAwsubaucw4sUwL03Du9TjVFYXB+GYvdLMHh9vrdw3ApGuaBxsmLoW2IZpHTnbJZ+DoRO6K4H5tOjbqpwt0IS8ZobUOr4dakA97UfOLvRd3ramE9FyrLgooydtov0udv8OMGt9ZbyRVjp5gBhxHULIBgx7Owgg0gWNocHrk9+XOY5ZM+AjKGD9ffybNeniKSaw+/7YPMWY/Ygzj1BgRrahXxrbRTKEpRIZd541qKd7PrM/Cv7R5UCEm0qDmrJ5EKVAAIGWGWGjs0kGBNpkVBB7Kxr8V3B3CYoAncK1Wun/mab1ITYm+yzhQ62sLJswGpZrUmmUBeJc1x+yrVfw26xcoYzw0affbuXRnCvskRs81XHTAzbTHg2Xhg8fEy9QnYC3qAoeydotpMjhbdwvn9vKAza0tyeums9UGIQzU9cx9TtmGvQ3e80QFf8P/UxQwrQhl9AyFmZ3WFNaA+PDXHm0wRZvSd2/oUZ+Y5YMl8PRY0vTGu/SYcsUZz2W2ehh9d6BssHC/7UjD5FmXsgVTBUC6BBbE7DeKsCo/u4CL8aBvVLxtaZKIwaHsCZ63EwVw08CrNweUdzIjT30FTm5ZCZUn9hYzjZvkxguUqAKn+FfWzOhWv07PPZ99nr4bTkTUCrVN0hw91vW8i70wDwef7QRF9eTqo+uUaoqR9vG6C0PgzHA5ZgnBL40lDh83gwXn5dAFfalB/e6Bb1ve3km65Eu3CmgU93iSAd9Fzo1LkWMRs0bmEz4b94Gel7qMhH/eP9qVBLcLyQC1KiNnwI/y3ofPzAOh84xRdqtznPkiiytqVP/P4J+i7og/ju5BLgK6gXzUz5hKXda85eEETK2r7gY/qbVkzi1vMfBoN0rYhvZGnUM3pMzoyA2DsY6gnH05HoO5VXuZ5GEuzzwV4ldI0UEGL1iZgHOuhQbZHdaL/YsqkzT90fd1ZoUYsUt4uPJF9UhK8d5aePu59FN4uZIpoJIZzYcBpwXSBBzoXLYTP/xn+3qJBJOSIUKau7rhVVCqHEyd5/Q7R79XrK9sIV2yN7bGliPmsWmbfwUgK4wGE2DmmXZlKI21suMAsG3OXGmgYcXRWwQCX9bC5I/Iq/oY9he6cy0sTFAKyfzfI/40Sj8Qx8u/UykZ/eeH1aaSRULwWpNBm5Evy3UAKBk1AKMWyS9oPKuAccIC/YQbfN0m8r8eBdRKUk0Jw44BevYbqJxzSeCqeJa3n5qiVP/QDAGS3ZfrGOWQFXmqyT1KEa8jNeVK4i+tq76BDCkA53JqwYFYrmbp7SlTEDacEmJcAgxnJZ4Y2XvodZ3A5sj3I/g+B4wKcYzuU44m5Pc6DqM5sb2M08f/9K2Zli4imPlCIgkvsPGVM5ygv8I9I4haJXyTY4nvgPWgi5ceARX9byrw8iyBqts2VGKzhsZ87DdAvWa+hYkZ1pbDiaIrHy206baMabK82vyfkNwZIuGRYy9H1k8gxEWNaluqEDXqZp1D+pGi+tfq1xwpsmGi3jEWDF5VF2iN3xnbgml+NYUFI8zgMVLDpafa6b1WtBrXzJE80X5CY+DLil8RfqQwtnLvv4g9k7HeftSjZGRokrCN16rP3g6mBxZUZcJ6jFKIlVlNCoiiok1ZfJF6b5x45dB9ey5HoUuVprs9oZPY9BFSjU/9drD78goJoxrxCOeeONlnjAy0O1fbOYPL/JhMum774OPUP8RCJMl4NKtp94tOAJfMtncbHhRKHr0CcHBfPHiNA6es57CUH/opFYT7d0ctFF1eBoYLiMvEg/L98wSJESvLzAIS7XKFx6R4uNszqazYbqf/G3jYGzuH/8+mqe6x7VFouWIqKGdwApoH33xssCRub8u2rc+CBDttUoZw0BYjzXS7qYLkV1PRlK0bwtl8z2Bng34ADf8ScjM7t9gv75YbxrXIfdh72pZbRQ6PRoGy1PFquTrxEhvXp4UkULyv8kfkZA3ucKcmulmtVO3jKPZbsJ6Ydls/g+QT9Y+ui/imwE5LLHLiquCd0LwSuCYAsPn+p12LF2vX9fa9rvHvCUCaACmwy0idPvkuIPZMTG3obw0laA6wdFa60gsvUu2dCx9wxumI6aS4mJ5McASFMiFTuoTApvzKmSpPL126fOLeqzZERdcJA4R56f5Eqxh92t9AEkDeqwU2/lmMsazX9r7Jgg24ibCYNixkpiJw6E3qcI02yYxy+kn0oGC5E9xGPAMKJ/DHGluG2bxFI0202iBE5jmd+7e3bnq2+CbCBbCZxqEWefLZOcOM6yd1EyR+O7g6bl8I2KMZBu8BiOgvixhy+yXPFHRdynIA79+sw3BpV4CC9lbOodpCvCJ1VYCdDOaErbEycxO14XDFq1b/FpOdJZAbzQPNClOHbp1CilRi0DYA9huPS7upje/rG12oD55fW1zID7cCd6E6r6pmbssyZfp+oZD81iNUDMsbNohH4nN4VjPqIBU4NmZgXbsQheY5gXg18T4zddVkCW4Hq3t/Kj7u5JAtJKke+0zcGR1upgayOEv9U0LusoqkVZmwUggPXWTH/R4BblYC25SAOre1PH+bU1zxERLeGXzzq0xU9nDzMT86GDd4eS3d1qe33xEuDYiiMrHOHpwben6DlzzhcBTtUIFUEbvSVg1Bf//8qp//49j///F+/++dSXY7ROJBFxECUlN7VlaMweaFSJMzQEnCsxqXS0vWsoOENkl7q2lHoj5AHEVP7H0Cw59U/xDs8/XW/XG8kN459tNyIIC1q8O6GJBxMAOP44ataqBMGEGnzouSUe8s94Ww7k1GSzVjX3BGey37ltDHxun09pY8IvPF1yDYQqPGNz0vxWPLbYja+yuIx0WkxsbgG9A2GpBRNtKcUdwf+VRCBd5gluDsfhiQJfPX5UBqZGAyzFAgg49A+E+3QdP7Yiwi/fmpuJacZzZ0DDXPyBBSePvEC11nmWRo/sFDG25LsrAuFUmWEFIhOi35sHI+HN/PK5HWySeQ0XJah2pBb5LzHPt42Uij0Et6h1kwHUtKTpDW9Q+mErq+s5s33BuyNMRcWtWVLoVH+cjAo50IpEY+b4tkBDvCUFMoz5b83IwLeekKkRkk8NTwyRk9cKdXiQw2pJKr2gbWj5evEMXFTDVdhYDl+OWCaLlu7Pe6gPnsIk8xFJM/YxtkN/dFbuq/mfClfCE1mrCx7a3GQ0N6NupC1LhcTEB0Nlts/8kFJAQEyiRMN6PiY4f+tqanlOdLdeXG6WAOVB88qGp7mGNAmMWVm3gGOGTr64TkF8mY7dbZG2OZiYO7FMFa/rEB125e+t1CjZ6M+PwM9LG3IgaQalgZhCBcwjnQuT+yg4isn1GEb5J/bB4++kRwL01Czj2O6fB2a9FKp8OgKdpMaRVZfscK8lAmqfvsM/H26aksLDbvWxheNakT0EQhsyWn+EPeMFW4TaoA+ZpWfLRtpSUdPS29R7qXMml66928xgWoqlm6sEzrIbN9lCpMoe/wVCCPcBOJ7wCU+Y9oHMciiaU9f8Qa4tNy9/b2F23k2R4SIeLZ+uE6B1d2v8toOlx1XPBmAdspXmQBvp+/apESHjb7UsZCc+ZEWymisCFc7YCIVUIo1QQKwoSzSVRIzsMwfK59u1I79xej11DoQQSe2CA1DR1ogzgoF62vZnN4RZK4OhW5Tvqr3Pgv4U0emTAACygoecfwB3SKnxed/UP2jmwgh2RodcMyIXiFilW6/zFToO5CNclXiZ7a8QtwgdZuO9SSmtSKAKFk6mxh7XoCt5KBhM+1tjX1L+2zN8s46tEIPG89CwGose9thtqjS1o0zr/v6cbepOHNMUQrd3pc5CcJUtLcbcS34c+K/Qf0B0ZbgHnc5nXK/V1UQAQSoC2rdyI/cmYqruwgmrRmt/bNFnu8yGcR/ZnaS+fZ1rSK9fUwvT0EIaMXhVCtRr+2sOg8zSQ4zqTKB/IPK7rFy/Cs0zAF9lY6+6hBWbkyvuaVg+GGNw5U0KRJaQQiWL6QD84fPsdL+ANMop98rFkIx3rxYKWi5+ARqo4QVZMCObJgumpxV5SxaPFB6JC4sGFfnk25P3IbtrvwCO6ck8VqZqu+TfMa14DmleghkyokxbmH/AGmgL/eW+/+MCfyZHXU5elZMYhSSmZFwC8NIvopwv6geseiHDdVvhH7O1nWkgItscreCCzNAihF3EXXohm1kI2mOCK6AJYH9hzE8R5FOQ90NcNfdw4jMEqKoVqgTyexo3HMzZRpxQXnnLJ/Bs6HcBHK4zic1wSetlzrKepvRaf5TyZhErNTIqqB4DMdgTkCQuQkEYsZLvlSp/VKVX9aOMJyFlIwXpnBPckkV9I/fmLZFLo0ZaVlPfqpigMYmTujWfs0nmfTK0dsXXf8fhzpMPxLLBE/MAlUBroriRmNONggI014aO5PhoyNfDfUS+G/6hZ7wNU13TpvA1TXp4zPljCNVnyPviHsegzPY1SkXh0tvP1UILMW5wq8+11gZ+lMsY/GJn475HUrXZ/QRLhbsyfHyeKx4VvwXF/e040lj74BfErJqrN3tGzQNEsNgP8JpyZi/ZbTxslj4eHGn7RyCG0iUlu8IOny95ncHwrGrKOpahn4W1RjnE+6vXqiEE1ElDJ5JWLyd4Hfthzp6hOJyacRtRbEn8mO6o4pw75lD9GflzIRxyAE/EkGFwWc9ta9+3dhDpJXtEIfMadax8gqhw2lhPQfLImLh2T6GeiYjKxJkD8VHC2VJqzceI5CbyiJb99w6j86KK5mrMXFo6Av7bk5jg4wjzxOziRjrfAONp6lyNVAQlrF07gIpgucF7L7akRg5BZEYcXbrDRnpVYkDEW/HDY+/frjsFvkn/kfA6XKee4HkxvTP7KdIsKLH+V0nFYbxrXI1FYCDcrvAEWMcpOqifLdalJQxhbocMU8kUXrOtwkACveDFw0xa5sRxQmp0mO3KZkg6dSjj9b///jTbr79HKphUmHQBlcmIw9kFQ2GjLRwI5/DEsgNDFYy8fAfFA/HrtsFjU1MrGHPS71WP+ogv6193D2AYE+PGBmAJTxfY0vO2dbYPo7CKm6fxxI5FtnvMtkwVquLh3pb9NOeG4eeQZFGuMCWJ15m3yQsCnRHHJUwmzV257uAbTwa6xIZty7tQCyaLjodzxM1TjsfbZjIGzH4dXc0YTqVmsVeb2i4mODEI5r+NisMSF8wlw0ZT25jL35typ4HBxfF0T9x/2x4dlP0zIYygypnTFlLBhfm92RH2S0jI075H/qBkSFEwjHp7M8IVT0ofZ3bkMMAUey+8+6N5BUgK3wse2OD8eBRLf80hg6gtOmGy6TcZgfRmVIaR5U6tKyfS74MksEiiI1vl6rrnVS07OpWju3xukYjKH3CkvFypXkntoG1iM/mBFaxYtnq7no7lXtvltbbvbgh2P4KPQnTzBKz8LEU4dDO4aMof5O6JlPvrg81lSF0756IQKZHVYLO32UYCZKpFFBrJupVj58o5OYB3zv5jduFkAZaZZgM/4JbHCcyc4vDdAnVAPG6TPQaEOr5HgAbs6cPbVde+2cymYiKoOa0HC4dBX8myExN0lu7HsV0F03Ip1Sros5e1Q/kl+6K/wuPFzU/fs+4A2BlD5Yhmx6v1eCwrZzjRV7PJrF+zYZaXaVdDnFpkcg1Y5CuhUZeCcFkNh9bFM3haxApLO6BZYO5O0i4Bp9dn1HQJp/5RznsoVqhXQvLQ78+HLO0vB9wr2gvxL7bLco9XwwH8lv9AAtifZzXMrgndkU3tpQCmUi8cTbkiWUMispTmutYJCWbzSNJyj6q65oVD6ufGtk8NQWp/5/61ClQF8Y1H9H/72V6QX8derUcHCfWm+VM5C7JLrOU4Q67QF/EnnTbywcEkQZtCAJpZYFii3yZ87SQv+k5Zm2RtBMqwa32pq7ZSTyYKbIdIHLRWpvuVbUhL+1CMmfJJjdUH7M3dRc1EtdVCz8y5xz+7xxXAKNuyqvd892tedjRFUpJ9znh+NsYEc1lDPVZ3jpiTjrh1UBidlkYPyrxGuVG6ymiM73Rr8ZEbscNafTTP7CT7TOixEw3T2i4w0ln6DXeJ2QroVd8mxbrRzVaw+vOf0b/Vv4RHtW+xrqScBZfTSiiGQMZ2nt411+t6BJePgskk9dxo/J6oun56+adjedpq1rbRStbM2oH3n3PfZlWBpVIfzbkF8Ur8CcpOFz/xDUPR/dk6okpHSntpvsM3zcyhV66hJ7HGQlc89uPBYBNiTlj4S1Lyu1W4cumDL8rs+D74jR0RETvpPJS03wk2h2lz1sWsg+ZD+FIv5Cs7rl5/AcwnCfJGiem3Lhax+eSgUcNrdjI4zfpyzYyquweFfmSz17kTjdvgcvCh/X7UcvKy8o9hK3kfGdz6nwbYixfkpfrq9wP3U3puZS6NQ0iqKRFs1oHqoVuAanX3Pxlsy6/Cxs5UaieEgu/clM8uGV45I925CciB3dbBuff74XjIBvw+mrkiN3djZeTPdKWA5Y0qCPHVCVeSOTJHmJYKjy4LCRuzOCavSr2X8IPlHsyzOrbaY6EJvbfjIx4UUDdUxHutg7GtALA9eDKK3u3RQgYmed+3Lwg+a1BZkGyzrUAVdzI9Cn+Mkns5NX+XqRrV07q0fOPyL20B5qmKsF2+yoO7D+sGbjjO/taCtVv4fzDJhGNN6RVRCSPkRnD5G/Ato4cbzIlzm+SolDHUA3Amujtdoboomh3nVPPGAv+gCjuT2g3r9yWItcpx6/ip0SQqKxn/gmicZow/x8riI2i/ppK62CTEhxo0IkhhAr26rppnHvGi1h7D0s0l23wyci3z+EBBcPw5RNbCT2JRXa9Ve6/seT9ajsGSgTqlCugdFQ8F0My4wTIpu5rBHG8o82EM74ModEVnOON4lyoHpdTHvYGxilZdulifvCnnfCd4KJfBvBocsnXOet19nIiEpDaAAUdGJdcJ7kkCZ2GO4w2NhuZLj4CMDjy7SxrF2jJm9ghP1Z/NgkQ1oVDFMt/LTtfSbh6spf1OvP8LAaG56y5j+30x9cExBi8iUsR1h8oHkPWjCgMWlorLyUGx31m22GqTInYYyECMnMvx/Bli/ZUd7jv5UKOqdx5TkXwdVMTzyv1IXaDXbhllIPsu02dw7DRNWayFobu+BzpJnKLNwwULQIBxy7zZLo2kVs7ASkEfG05Rsz/hBRgQEj3MArXqhV2EPNw9y4UAd7XUc81qUjXQn/Pn4ClkXSa2RMaCBIX4DrTKkTShtIrJJP8g9gsa5oP4xt8Qfn8nDNRrnJUQ2VjLIr3uSuukjSsNwykWKAjn0XmYNJzKw6A8vvsI5ZOYbEfGERGoTcGJ0N62MSpv2S42764OQdBkr7hpt4Qkcoorufyhwwunwqhp59CGZacEGXcWMhoCuv/HptH0u4HoN+SM9JJbWLaiUO7vP9QLhfRgkHMrzRd2J+1AoC55Z/UWV//JX0zBMswpZSauUYzrugm/sOYkQpfjbJ8JVhWQn3/S0uM/ctsdbqtFsmc9Csl0dKlxHnSP4RP/609I7bGk23/AJBtexm84cQLSSjzWdTnvATLvZ5OvFFi/fUaGfeens2Xv7lDcMsSIteJPE5KXSfAsG3x16V2ZlU79OMIwNx9dRQONk7CnYWneqE/qnJsbpNI/rIMkYdv0s504fIynkn7Pk4vgPGyv98vWiq+zPK6nVHgMR/46bJRTUQkqAwJu21SaRORfL9dYBVNf6NJTtolGualE/th39d86cWJozm6WHdXt9V+eCDPLFHNR8s0KGuEKYbiXnYqvTU2maUyexWaNQR4S6tKZN4zSTxpdL6fIhi7iwkJ/RGaO14KHKdROrIZo0VnkxuJ+9BSI93P/bc1PSwxvVuVdKbCtduKM4vLkn8bEyAnFP8Griy1Ilrfu2+Clum9Pus1350tjjqjry8ly2VvNWvfrM9MDRtvIOGPRFQZPCqLcvvXuCWYUg7c9E61xmvvpHwK8b65sWrzpuhEKO6Sz5UJhY//7wpIm/mG3vXucl+H6/mtx/4ZnCQHg28CdsVNF5RBwf60U5fS4idktN53efRuQ7Y7DTeaaQA4JgCGbH+2aVyzkXC60f//+J1L//dumgT9npVol3uW4hrAp1ryGFh4KgR3tUvm6q7CgsCLAxKanEq5ojmjEIvw9JTuh705J7fHMQjmjnBfOVXODKbgI28VN4sBYvxV/8COAAAAASr9+kqJgZUszc4O/Ka0qfEvo+G/24P7NGn41U6IZ9WD1z7W4DPkhX/565jnPs7MxvFP+d4duA8//xjdvv/6x9/Pq3IWmYs5jzZjuxmHbVaj/DgjJiZXPgLnXlP5HqY/+Zpsjs3DPr7X6Gb2XTWevJQ2Y2QXhmUr7/Xo1ICVQd5KnC7wGgGlsW5Ww5bzfutLgHOUQtzlxhn8577q9WVnRBHUgbhiwXel8fCNHtl9e+taImxmfeBsgm9CIFXHICoXcx+eI437MfA55dIAAAA=" alt="No.8 Coffee Supply" width="163" height="93">
+        <div class="brand-copy">
+          <span class="app-name">Log Pengantaran</span>
+          <span class="app-sub" id="headerSub">No.8 Coffee Supply</span>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button type="button" class="icon-btn" id="themeToggle" aria-label="Ganti tema terang/gelap" aria-pressed="false">
+          <svg class="icon icon-sun"><use href="#icon-sun" xlink:href="#icon-sun"></use></svg>
+          <svg class="icon icon-moon"><use href="#icon-moon" xlink:href="#icon-moon"></use></svg>
+        </button>
+      </div>
+    </div>
+    <div class="user-bar" id="userBar" style="display:none;">
+      <span id="userEmailLabel"></span>
+      <button type="button" class="btn-ghost-light" id="btnKeluar">
+        <svg class="icon"><use href="#icon-logout" xlink:href="#icon-logout"></use></svg>Keluar
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+<div class="shell-narrow" id="bootLoading">
+  <div class="boot-skel">
+    <div class="skeleton sk-logo"></div>
+    <div class="skeleton sk-line" style="width:60%;margin:0 auto;"></div>
+    <div class="skeleton sk-card"></div>
+    <div class="skeleton sk-card"></div>
+  </div>
+</div>
+
+<div class="shell-narrow" id="authGate" style="display:none;">
+  <div class="auth-card">
+    <h2>Masuk</h2>
+    <div class="auth-sub">Login sekali di tiap perangkat (HP &amp; laptop) pakai email &amp; password yang sama, supaya data otomatis tersinkron di semua perangkat. Belum punya akun? Isi email &amp; password lalu tekan "Daftar Akun Baru" — cukup sekali saja.</div>
+    <div class="field">
+      <label for="auth-email">Email</label>
+      <input type="email" id="auth-email" autocomplete="email" placeholder="mis. nama@email.com">
+    </div>
+    <div class="field">
+      <label for="auth-pass">Password</label>
+      <input type="password" id="auth-pass" autocomplete="current-password" placeholder="minimal 6 karakter">
+    </div>
+    <div class="field-note" id="authError"></div>
+    <button type="button" class="btn btn-primary btn-block" id="btnMasuk">Masuk</button>
+    <button type="button" class="btn btn-secondary btn-block" id="btnDaftar" style="margin-top:10px;">Daftar Akun Baru</button>
+    <div class="auth-links" style="justify-content:center;">
+      <button type="button" id="btnLupaPassword">Lupa Password?</button>
+    </div>
+  </div>
+</div>
+
+<div class="shell" id="appContent" style="display:none;">
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label"><svg class="icon"><use href="#icon-calendar" xlink:href="#icon-calendar"></use></svg>Hari ini</div>
+      <div class="stat-value num-mono" id="todayJarak">0<span class="unit">km</span></div>
+      <div id="todayDetail">0 trip · 0 transaksi</div>
+      <div class="stat-nilai" id="todayNilai"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><svg class="icon"><use href="#icon-box" xlink:href="#icon-box"></use></svg>Bulan ini</div>
+      <div class="stat-value num-mono" id="monthJarak">0<span class="unit">km</span></div>
+      <div id="monthDetail">0 trip · 0 transaksi</div>
+      <div class="stat-nilai" id="monthNilai"></div>
+    </div>
+  </div>
+
+  <div class="main-grid">
+    <section class="card form-section">
+      <div class="title-row" style="margin-bottom:10px;">
+        <span class="section-icon"><svg class="icon"><use href="#icon-plus" xlink:href="#icon-plus"></use></svg></span>
+        <h2>Tambah Trip</h2>
+      </div>
+      <div class="card-head" style="margin-bottom:16px;"><span class="hint">1 trip = 1 kali jalan (pulang-pergi). Pilih mode sesuai rute.</span></div>
+
+      <div class="mode-toggle" role="group" aria-label="Mode tujuan">
+        <button type="button" class="mode-btn active" id="modeBtnSingle" onclick="setMode('single')">
+          <svg class="icon"><use href="#icon-pin" xlink:href="#icon-pin"></use></svg>1 tujuan
+        </button>
+        <button type="button" class="mode-btn" id="modeBtnMulti" onclick="setMode('multi')">
+          <svg class="icon"><use href="#icon-box" xlink:href="#icon-box"></use></svg>Banyak tujuan
+        </button>
+      </div>
+
+      <div class="field">
+        <label for="f-tanggal">Tanggal &amp; Jam</label>
+        <div class="row2 dt-row">
+          <div><input type="date" id="f-tanggal"></div>
+          <div><input type="time" id="f-waktu"></div>
+        </div>
+      </div>
+
+      <div id="singleTujuanWrap">
+        <div class="field">
+          <label for="f-tujuan">Tujuan</label>
+          <input type="text" id="f-tujuan" placeholder="mis. Anak Panah Coffee, atau tap untuk lihat favorit">
+          <div class="field-note" id="f-tujuan-note"></div>
+        </div>
+        <div class="field">
+          <label for="f-nilai">Nilai transaksi (Rp)</label>
+          <input type="text" id="f-nilai" inputmode="numeric" autocomplete="off" placeholder="opsional, mis. 1.250.000">
+          <div class="hint-text">Kosongkan kalau pengantaran ini bukan untuk No.8 Coffee Supply (mis. roastery).</div>
+        </div>
+      </div>
+
+      <div id="multiTujuanWrap" class="field" style="display:none;">
+        <label id="multiTujuanLabel">Tujuan (bisa lebih dari satu)</label>
+        <div id="multiStopList" role="group" aria-labelledby="multiTujuanLabel"></div>
+        <button type="button" class="btn btn-secondary btn-block btn-sm" style="margin-top:2px;" onclick="tambahBarisStop()">
+          <svg class="icon"><use href="#icon-plus" xlink:href="#icon-plus"></use></svg>Tambah tujuan
+        </button>
+        <div class="hint-text ms-nilai-total" aria-live="polite"></div>
+        <div class="hint-text">Jarak PP total tetap diisi manual di bawah, supaya akurat.</div>
+      </div>
+
+      <div class="row2">
+        <div class="field" style="margin-bottom:0;">
+          <label for="f-jumlah">Jumlah transaksi</label>
+          <input type="number" id="f-jumlah" min="1" step="1" value="1">
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label for="f-jarak">Jarak PP (km)</label>
+          <input type="number" id="f-jarak" min="0" step="0.1" placeholder="mis. 3.0">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="f-catatan">Catatan (opsional)</label>
+        <input type="text" id="f-catatan" placeholder="mis. 2 pesanan sekaligus">
+      </div>
+
+      <button type="button" class="btn btn-primary btn-block" id="btnSimpanTrip" onclick="tambahTrip()">
+        <svg class="icon"><use href="#icon-check" xlink:href="#icon-check"></use></svg>Simpan Trip
+      </button>
+    </section>
+
+    <section class="card">
+      <div class="title-row" style="margin-bottom:14px;">
+        <span class="section-icon"><svg class="icon"><use href="#icon-box" xlink:href="#icon-box"></use></svg></span>
+        <h2>Riwayat Pengantaran</h2>
+      </div>
+
+      <div class="filter-row">
+        <div class="field">
+          <label for="filterDari">Dari</label>
+          <input type="date" id="filterDari">
+        </div>
+        <div class="field">
+          <label for="filterSampai">Sampai</label>
+          <input type="date" id="filterSampai">
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="resetFilter()">
+          <svg class="icon"><use href="#icon-filter" xlink:href="#icon-filter"></use></svg>Semua
+        </button>
+      </div>
+      <div class="field" style="max-width:180px;">
+        <label for="tarifKm">Tarif/km (Rp)</label>
+        <input type="number" id="tarifKm" min="0" step="100" placeholder="mis. 2000">
+      </div>
+
+      <div class="total-banner">
+        <div>
+          <div class="stat-chip" style="margin-bottom:2px;color:var(--brand-light);font-weight:700;">Total jarak (untuk reimburse bensin)</div>
+          <div class="value num-mono" id="totalJarakFilter">0 <small>km</small></div>
+          <div id="totalReimburseFilter" style="margin-top:2px;font-size:.78rem;color:var(--brand-light);font-weight:600;"></div>
+          <div class="total-nilai" id="totalNilaiFilter"></div>
+        </div>
+        <div id="totalDetailFilter">0 trip · 0 transaksi</div>
+      </div>
+
+      <div id="tripList" style="margin-top:14px;"></div>
+      <div class="empty-state" id="emptyState" style="display:none;">
+        <span class="empty-icn"><svg class="icon"><use href="#icon-inbox" xlink:href="#icon-inbox"></use></svg></span>
+        <span class="empty-title">Belum ada trip</span>
+        <span class="empty-sub">Isi form Tambah Trip untuk mulai mencatat pengantaran hari ini.</span>
+      </div>
+    </section>
+  </div>
+
+  <section class="card" style="margin-top:16px;" id="cafeReportSection">
+    <div class="title-row" style="margin-bottom:10px;">
+      <span class="section-icon"><svg class="icon"><use href="#icon-chart" xlink:href="#icon-chart"></use></svg></span>
+      <h2>Laporan per Cafe</h2>
+    </div>
+    <div class="card-head" style="margin-bottom:14px;"><span class="hint">Bahan evaluasi: transaksi, nilai rupiah &amp; tren tiap cafe dalam satu periode.</span></div>
+
+    <div class="report-presets">
+      <button type="button" class="chip-btn active" data-preset="month">Bulan Ini</button>
+      <button type="button" class="chip-btn" data-preset="lastmonth">Bulan Lalu</button>
+      <button type="button" class="chip-btn" data-preset="custom">Pilih Tanggal</button>
+    </div>
+    <div class="filter-row" id="cafeReportCustomRange" style="display:none;margin-top:10px;">
+      <div class="field"><label for="cafeDari">Dari</label><input type="date" id="cafeDari"></div>
+      <div class="field"><label for="cafeSampai">Sampai</label><input type="date" id="cafeSampai"></div>
+    </div>
+    <div class="hint-text" id="cafeReportPeriodLabel" style="margin:8px 0 14px;"></div>
+
+    <div class="empty-state" id="cafeReportEmpty" style="display:none;">
+      <span class="empty-icn"><svg class="icon"><use href="#icon-inbox" xlink:href="#icon-inbox"></use></svg></span>
+      <span class="empty-title">Belum ada data</span>
+      <span class="empty-sub">Belum ada trip tercatat di periode ini.</span>
+    </div>
+
+    <div id="rpBody">
+      <!-- 1. Angka kunci periode -->
+      <div class="rp-kpis">
+        <div class="rp-kpi">
+          <span class="hl-label">Total transaksi</span>
+          <span class="rp-kpi-value" id="kpiTransaksi">—</span>
+          <span class="rp-kpi-sub" id="kpiTransaksiSub"></span>
+        </div>
+        <div class="rp-kpi rp-kpi-hero">
+          <span class="hl-label">Total nilai (Rp)</span>
+          <span class="rp-kpi-value" id="kpiNilai">—</span>
+          <span class="rp-kpi-sub" id="kpiNilaiBanding"></span>
+        </div>
+        <div class="rp-kpi">
+          <span class="hl-label">Rata-rata per trip</span>
+          <span class="rp-kpi-value" id="kpiRata">—</span>
+          <span class="rp-kpi-sub" id="kpiRataSub"></span>
+        </div>
+        <div class="rp-kpi">
+          <span class="hl-label">Kelengkapan nilai</span>
+          <span class="rp-kpi-value" id="kpiLengkap">—</span>
+          <div class="rp-meter" aria-hidden="true"><div class="rp-meter-fill" id="kpiLengkapBar"></div></div>
+          <span class="rp-kpi-sub" id="kpiLengkapSub"></span>
+        </div>
+      </div>
+      <div class="hint-text" id="nilaiKeteranganPeriode" style="margin:10px 0 0;"></div>
+
+      <!-- 2. Sorotan otomatis -->
+      <div class="sub-block-title">Sorotan periode ini</div>
+      <ul class="rp-insights" id="rpInsights"></ul>
+
+      <!-- 3. Tabel gabungan per cafe -->
+      <div class="sub-block-title">Per cafe</div>
+      <div class="hint-text" style="margin:-2px 0 10px;">Diurutkan menurut kolom yang diklik (nilai terbesar dulu). Tap nama cafe untuk melihat kalender pemesanannya.</div>
+      <div class="rp-table-wrap">
+        <table class="cafe-table rp-table" id="cafeTable">
+          <colgroup><col style="width:31%"><col style="width:14%"><col style="width:25%"><col style="width:15%"><col style="width:15%"></colgroup>
+          <thead>
+            <tr>
+              <th data-sort="nama">Cafe</th>
+              <th data-sort="transaksi" class="num">Transaksi</th>
+              <th data-sort="nilai" class="num sort-desc">Nilai (Rp)</th>
+              <th data-sort="rataNilai" class="num">Rata-rata</th>
+              <th class="num">
+                <span class="th-with-info">Tren<button type="button" class="info-dot" id="btnTrenInfo" aria-label="Penjelasan kolom Tren">i</button></span>
+              </th>
+            </tr>
+          </thead>
+          <tbody id="cafeTableBody"></tbody>
+        </table>
+      </div>
+      <div class="hint-text" id="nilaiTidakAdaNote"></div>
+
+      <!-- 4. Tren bulanan -->
+      <div class="sub-block-title">Tren nilai per bulan</div>
+      <div class="hint-text" style="margin:-2px 0 10px;">Batang = total nilai tiap bulan. Kolom pudar = bulan pembanding sebelum periode. Di bawah angka: perubahan % dan selisih Rp dibanding bulan sebelumnya.</div>
+      <div class="mchart-scroll"><div class="mchart" id="trendChart"></div></div>
+      <div class="hint-text" id="trendEmpty"></div>
+
+      <details class="rp-howto">
+        <summary>Cara membaca laporan ini</summary>
+        <ul>
+          <li><b>Transaksi</b> = banyaknya pesanan, termasuk trip yang belum punya nilai.</li>
+          <li><b>Nilai (Rp)</b> = total rupiah dari trip yang sudah diisi nilainya. Trip kosong tidak dihitung sebagai Rp 0.</li>
+          <li><b>Rata-rata</b> per cafe = nilai ÷ transaksi yang sudah bernilai. Di ringkasan atas = nilai ÷ jumlah trip bernilai.</li>
+          <li><b>Tren</b> = perubahan dibanding periode sebelumnya yang sama panjang. <i>trx</i> untuk transaksi, <i>nilai</i> untuk rupiah. "–" berarti belum bisa dibandingkan.</li>
+          <li><b>Kelengkapan nilai</b> menunjukkan berapa banyak trip yang sudah punya nilai. Makin tinggi, makin pas untuk dicocokkan dengan POS.</li>
+        </ul>
+      </details>
+    </div>
+
+    <div class="pos-export">
+      <div class="field">
+        <label for="posCafeSelect">Crosscheck POS (CSV)</label>
+        <select id="posCafeSelect"></select>
+      </div>
+      <button type="button" class="btn btn-secondary" id="btnUnduhPos" onclick="unduhPosCafe()">
+        <svg class="icon"><use href="#icon-download" xlink:href="#icon-download"></use></svg>Unduh CSV Crosscheck POS
+      </button>
+    </div>
+    <div class="hint-text">CSV berisi tanggal, cafe, jumlah transaksi, dan nilai transaksi dalam angka polos (tanpa Rp/titik) supaya langsung bisa dijumlahkan di Excel. Pilih "Semua cafe" untuk satu file periode ini, atau satu cafe saja.</div>
+    <button type="button" class="btn btn-secondary btn-block" style="margin-top:14px;" onclick="unduhLaporanCafe()">
+      <svg class="icon"><use href="#icon-download" xlink:href="#icon-download"></use></svg>Unduh Laporan Cafe (CSV)
+    </button>
+  </section>
+
+  <div class="acc-grid" style="margin-top:16px;">
+    <details class="acc">
+      <summary>
+        <span class="title-row"><span class="section-icon"><svg class="icon"><use href="#icon-pin" xlink:href="#icon-pin"></use></svg></span>Kelola Tujuan Favorit</span>
+        <svg class="icon chev"><use href="#icon-chevron" xlink:href="#icon-chevron"></use></svg>
+      </summary>
+      <div class="acc-body">
+        <div class="hint-text" style="margin-bottom:12px;">Simpan jarak satu arah dari kantor supaya jarak PP terisi otomatis pas pilih tujuan ini.</div>
+        <div class="row2">
+          <div><label for="fav-nama" class="sr-only">Nama tujuan favorit</label><input type="text" id="fav-nama" placeholder="Nama tujuan"></div>
+          <div><label for="fav-jarak" class="sr-only">Jarak satu arah (km)</label><input type="number" id="fav-jarak" placeholder="Jarak 1 arah (km)" step="0.1" min="0"></div>
+        </div>
+        <button type="button" class="btn btn-secondary btn-block" id="btnTambahFavorit" style="margin-top:10px;" onclick="tambahFavorit()">
+          <svg class="icon"><use href="#icon-plus" xlink:href="#icon-plus"></use></svg>Tambah Favorit
+        </button>
+        <div id="listFavorit" style="margin-top:14px;"></div>
+      </div>
+    </details>
+
+    <details class="acc">
+      <summary>
+        <span class="title-row"><span class="section-icon"><svg class="icon"><use href="#icon-trash" xlink:href="#icon-trash"></use></svg></span>Tempat Sampah<span id="trashCount"></span></span>
+        <svg class="icon chev"><use href="#icon-chevron" xlink:href="#icon-chevron"></use></svg>
+      </summary>
+      <div class="acc-body">
+        <div class="hint-text" style="margin-bottom:12px;">Trip yang dihapus disimpan di sini dulu, tidak langsung hilang. Pulihkan kalau salah hapus, atau hapus permanen kalau memang sudah tidak dibutuhkan.</div>
+        <div id="listTrash"></div>
+        <button type="button" class="btn btn-danger btn-block" id="btnKosongkanSampah" style="margin-top:12px;" onclick="kosongkanSampah()">
+          <svg class="icon"><use href="#icon-trash" xlink:href="#icon-trash"></use></svg>Kosongkan Tempat Sampah
+        </button>
+      </div>
+    </details>
+
+    <details class="acc">
+      <summary>
+        <span class="title-row"><span class="section-icon"><svg class="icon"><use href="#icon-download" xlink:href="#icon-download"></use></svg></span>Backup &amp; Restore</span>
+        <svg class="icon chev"><use href="#icon-chevron" xlink:href="#icon-chevron"></use></svg>
+      </summary>
+      <div class="acc-body">
+        <div class="hint-text" style="margin-bottom:12px;">Data utama sudah tersinkron otomatis lewat cloud. Fitur di bawah ini untuk cadangan tambahan (mis. sebelum impor besar, atau untuk dibuka di Excel).</div>
+        <div class="backup-actions" style="margin-bottom:10px;">
+          <button type="button" class="btn btn-secondary" onclick="unduhJSON()"><svg class="icon"><use href="#icon-download" xlink:href="#icon-download"></use></svg>Backup (JSON)</button>
+          <button type="button" class="btn btn-secondary" onclick="unduhCSV()"><svg class="icon"><use href="#icon-download" xlink:href="#icon-download"></use></svg>Unduh CSV</button>
+        </div>
+        <div class="backup-actions">
+          <button type="button" class="btn btn-outline btn-block" id="btnImporBackup" onclick="document.getElementById('importFile').click()">
+            <svg class="icon"><use href="#icon-upload" xlink:href="#icon-upload"></use></svg>Impor Backup (JSON)
+          </button>
+          <input type="file" id="importFile" accept="application/json" onchange="importJSON(event)" class="sr-only">
+        </div>
+      </div>
+    </details>
+  </div>
+
+</div>
+</main>
+
+<footer class="note">
+  <div class="shell">
+    <p>Catatan: data disimpan di Firebase (akun cloud kamu sendiri) dan tersinkron otomatis ke semua perangkat yang login pakai email &amp; password yang sama — tidak lagi bergantung pada satu HP/browser saja. Kalau internet putus sebentar, data yang ditambah/diubah tetap tersimpan di HP/laptop dan otomatis terkirim begitu koneksi kembali. Gunakan tombol Backup sesekali untuk jaga-jaga di luar cloud.</p>
+  </div>
+</footer>
+
+<div class="modal-backdrop" id="editModal" role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
+  <div class="modal-box">
+    <div class="modal-grabber"></div>
+    <h3 id="editModalTitle">Edit Trip</h3>
+    <div class="field">
+      <label for="edit-tanggal">Tanggal &amp; Jam</label>
+      <div class="row2 dt-row">
+        <div><input type="date" id="edit-tanggal"></div>
+        <div><input type="time" id="edit-waktu"></div>
+      </div>
+    </div>
+    <div class="field" id="edit-singleTujuanWrap">
+      <label for="edit-tujuan">Tujuan</label>
+      <input type="text" id="edit-tujuan" placeholder="mis. Anak Panah Coffee">
+    </div>
+    <div class="field" id="edit-singleNilaiWrap">
+      <label for="edit-nilai">Nilai transaksi (Rp)</label>
+      <input type="text" id="edit-nilai" inputmode="numeric" autocomplete="off" placeholder="opsional, mis. 1.250.000">
+      <div class="hint-text">Kosongkan kalau pengantaran ini bukan untuk No.8 Coffee Supply.</div>
+    </div>
+    <div class="field" id="edit-multiTujuanWrap" style="display:none;">
+      <label id="edit-multiTujuanLabel">Tujuan (bisa lebih dari satu)</label>
+      <div id="edit-multiStopList" role="group" aria-labelledby="edit-multiTujuanLabel"></div>
+      <button type="button" class="btn btn-secondary btn-block btn-sm" style="margin-top:2px;" onclick="tambahBarisStop('',1,document.getElementById('edit-multiStopList'),'edit-jumlah')">
+        <svg class="icon"><use href="#icon-plus" xlink:href="#icon-plus"></use></svg>Tambah tujuan
+      </button>
+      <div class="hint-text ms-nilai-total" aria-live="polite"></div>
+    </div>
+    <div class="row2">
+      <div class="field" style="margin-bottom:0;">
+        <label for="edit-jumlah">Jumlah transaksi</label>
+        <input type="number" id="edit-jumlah" min="1" step="1">
+      </div>
+      <div class="field" style="margin-bottom:0;">
+        <label for="edit-jarak">Jarak PP (km)</label>
+        <input type="number" id="edit-jarak" min="0" step="0.1">
+      </div>
+    </div>
+    <div class="field">
+      <label for="edit-catatan">Catatan (opsional)</label>
+      <input type="text" id="edit-catatan">
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-secondary" id="btnBatalEdit" onclick="tutupModalEdit()">Batal</button>
+      <button type="button" class="btn btn-primary" id="btnSimpanEdit" onclick="simpanEditTrip()">
+        <svg class="icon"><use href="#icon-check" xlink:href="#icon-check"></use></svg>Simpan Perubahan
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal konfirmasi umum — dipakai untuk semua aksi penting (ganti confirm() bawaan browser) -->
+<div class="modal-backdrop" id="confirmModal" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmMsg">
+  <div class="modal-box confirm-box">
+    <div class="confirm-icon" id="confirmIcon">
+      <svg class="icon"><use href="#icon-alert" xlink:href="#icon-alert"></use></svg>
+    </div>
+    <div class="confirm-title" id="confirmTitle">Yakin?</div>
+    <div class="confirm-msg" id="confirmMsg"></div>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-secondary" id="confirmBtnCancel">Batal</button>
+      <button type="button" class="btn btn-danger" id="confirmBtnOk">Konfirmasi</button>
+    </div>
+  </div>
+</div>
+
+<!-- Kalender pemesanan per cafe — dibuka dengan tap nama cafe di Laporan per Cafe -->
+<div class="modal-backdrop" id="cafeCalendarModal" role="dialog" aria-modal="true" aria-labelledby="cafeCalTitle">
+  <div class="modal-box" style="max-width:420px;">
+    <div class="modal-grabber"></div>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+      <h3 id="cafeCalTitle" style="margin-bottom:2px;">Cafe</h3>
+      <button type="button" class="icon-btn-ghost" onclick="tutupKalenderCafe()" aria-label="Tutup">
+        <svg class="icon"><use href="#icon-x" xlink:href="#icon-x"></use></svg>
+      </button>
+    </div>
+    <div class="hint-text" id="cafeCalSummary" style="margin:0 0 16px;"></div>
+
+    <div class="cal-nav">
+      <button type="button" class="icon-btn-ghost" onclick="gantiBulanKalenderCafe(-1)" aria-label="Bulan sebelumnya">
+        <svg class="icon"><use href="#icon-chevron-left" xlink:href="#icon-chevron-left"></use></svg>
+      </button>
+      <span class="cal-month-label" id="cafeCalMonthLabel">—</span>
+      <button type="button" class="icon-btn-ghost" onclick="gantiBulanKalenderCafe(1)" aria-label="Bulan berikutnya">
+        <svg class="icon"><use href="#icon-chevron-right" xlink:href="#icon-chevron-right"></use></svg>
+      </button>
+    </div>
+    <div class="hint-text" id="cafeCalNilaiBulan" style="margin:-4px 0 12px;"></div>
+    <div class="cal-dow-row">
+      <span class="cal-dow">Min</span><span class="cal-dow">Sen</span><span class="cal-dow">Sel</span>
+      <span class="cal-dow">Rab</span><span class="cal-dow">Kam</span><span class="cal-dow">Jum</span><span class="cal-dow">Sab</span>
+    </div>
+    <div class="cal-grid" id="cafeCalGrid"></div>
+    <div class="cal-legend">
+      <span class="cal-legend-item"><span class="cal-swatch tier-0"></span>Tidak order</span>
+      <span class="cal-legend-item"><span class="cal-swatch tier-1"></span>Sedikit</span>
+      <span class="cal-legend-item"><span class="cal-swatch tier-3"></span>Ramai</span>
+    </div>
+  </div>
+</div>
+
+<div id="toastWrap" aria-live="polite"><div class="toast" id="toast"></div></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+import {
+  getAuth, onAuthStateChanged, signInWithEmailAndPassword,
+  createUserWithEmailAndPassword, signOut, sendPasswordResetEmail
+} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+import {
+  initializeFirestore, persistentLocalCache, persistentMultipleTabManager,
+  collection, doc, addDoc, updateDoc, deleteDoc, getDoc, getDocs,
+  onSnapshot, writeBatch, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+
+// ================= KONFIGURASI FIREBASE =================
+// TIDAK DIUBAH dari versi sebelumnya — redesign ini murni tampilan/UI.
+const firebaseConfig = {
+  apiKey: "AIzaSyCf9DClCSfRF6EuRGy7iQH6ESlYaRlUvb0",
+  authDomain: "log-pengantaran.firebaseapp.com",
+  projectId: "log-pengantaran",
+  storageBucket: "log-pengantaran.firebasestorage.app",
+  messagingSenderId: "107686496552",
+  appId: "1:107686496552:web:850e9d52bd5331be99e81d"
+};
+// ==========================================================
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = initializeFirestore(app, {
+  localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
+});
+
+let currentUser = null;
+let unsubTrips = null;
+let unsubFavs = null;
+
+let trips = [];   // semua trip milik user, termasuk yang trashed:true
+let favs = [];
+let currentMode = 'single';
+
+// ---------- Util ----------
+function pad(n){ return n.toString().padStart(2,'0'); }
+function todayISO(){ const d=new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+function nowHM(){ const d=new Date(); return `${pad(d.getHours())}:${pad(d.getMinutes())}`; }
+function fmtTglShort(iso){ const [y,m,d]=iso.split('-'); return `${d}/${m}`; }
+function fmtTglLong(iso){
+  const bulan=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+  const [y,m,d]=iso.split('-');
+  return { num:parseInt(d,10), mon:bulan[parseInt(m,10)-1] };
+}
+function fmtKm(n){ return (Math.round(n*10)/10).toString().replace('.',','); }
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function svgIcon(name){
+  return `<svg class="icon" aria-hidden="true"><use href="#icon-${name}" xlink:href="#icon-${name}"></use></svg>`;
+}
+function statChips(trip, jml){
+  return `<span class="stat-chip">${svgIcon('pin')}<b>${trip}</b> trip</span><span class="stat-chip">${svgIcon('box')}<b>${jml}</b> transaksi</span>`;
+}
+function statChipsSimple(jml, jarak){
+  return `<span class="stat-chip">${svgIcon('box')}<b>${jml}</b> transaksi</span><span class="stat-chip">${svgIcon('pin')}<b>${fmtKm(jarak)}</b> km</span>`;
+}
+
+// ---------- Nilai transaksi (Rp) ----------
+// Nilai disimpan sebagai number (rupiah bulat). null = belum diisi, BUKAN 0.
+function formatRibuan(digits){ return String(digits).replace(/\B(?=(\d{3})+(?!\d))/g,'.'); }
+function fmtRibuan(n){ return formatRibuan(String(Math.round(n))); }
+function fmtRp(n){ return (n<0?'-':'') + 'Rp ' + formatRibuan(String(Math.round(Math.abs(n)))); }
+function fmtRingkas(n){
+  if(n>=1000000) return (Math.round(n/10000)/100).toString().replace('.',',') + ' jt';
+  if(n>=1000) return Math.round(n/1000) + ' rb';
+  return String(Math.round(n));
+}
+function persen(a,b){ return b>0 ? Math.round(a/b*100) : 0; }
+
+// Membaca isi kolom nilai: kosong -> value null (tanpa error); negatif, desimal, atau tidak valid -> error.
+function parseRupiah(raw){
+  const s = String(raw==null ? '' : raw).trim();
+  if(s==='') return {value:null, error:null};
+  if(s.startsWith('-')) return {value:null, error:'Nilai transaksi tidak boleh negatif'};
+  if(/[.,]\d{0,2}$/.test(s)) return {value:null, error:'Nilai transaksi harus angka bulat rupiah (tanpa koma/desimal)'};
+  const digits = s.replace(/\D/g,'');
+  if(digits==='') return {value:null, error:'Nilai transaksi harus berupa angka'};
+  const n = parseInt(digits,10);
+  if(!Number.isSafeInteger(n)) return {value:null, error:'Nilai transaksi terlalu besar'};
+  return {value:n, error:null};
+}
+
+// Pemisah ribuan saat mengetik (1250000 -> 1.250.000), posisi kursor tetap dijaga.
+function pasangFormatRupiah(el){
+  if(!el) return;
+  el.addEventListener('input', function(){
+    const raw = this.value;
+    // Tanda desimal sedang diketik (mis. "12," atau "12,5"): dibiarkan supaya ditolak saat simpan, tidak dihapus diam-diam.
+    if(/[.,]\d{0,2}$/.test(raw.trim())) return;
+    const neg = raw.trim().startsWith('-');
+    const digits = raw.replace(/\D/g,'').replace(/^0+(?=\d)/,'');
+    const caret = this.selectionStart==null ? raw.length : this.selectionStart;
+    const digitsSebelum = raw.slice(0,caret).replace(/\D/g,'').length;
+    let out = digits ? formatRibuan(digits) : '';
+    if(neg) out = '-' + out;
+    this.value = out;
+    let pos = 0, seen = 0;
+    while(pos < out.length && seen < digitsSebelum){ if(/\d/.test(out[pos])) seen++; pos++; }
+    if(neg && pos===0 && out.length) pos = 1;
+    try{ this.setSelectionRange(pos,pos); }catch(e){}
+  });
+}
+
+function nilaiTripOf(t){ return (typeof t.nilaiTotal==='number' && isFinite(t.nilaiTotal)) ? t.nilaiTotal : null; }
+function hitungNilaiTotal(list){
+  const angka = list.filter(r=>typeof r.nilai==='number');
+  return angka.length ? angka.reduce((s,r)=>s+r.nilai,0) : null;
+}
+// Rincian dari backup: nilai dipaksa jadi angka bulat >= 0, selain itu null (file lama tanpa nilai tetap aman).
+function bersihkanRincian(list){
+  return list.map(r=>{
+    const n = (r.nilai===null || r.nilai===undefined || r.nilai==='') ? NaN : Number(r.nilai);
+    return {nama:r.nama, jumlah:r.jumlah, nilai:(isFinite(n) && n>=0) ? Math.round(n) : null};
+  });
+}
+// Membaca semua baris "banyak tujuan" (form Tambah Trip atau modal Edit) sekaligus.
+function bacaRincianMulti(container){
+  let error = null;
+  const rincian = [];
+  container.querySelectorAll('.ms-row').forEach(r=>{
+    const nil = parseRupiah(r.querySelector('.ms-nilai').value);
+    if(nil.error && !error) error = nil.error;
+    const nama = r.querySelector('.ms-tujuan').value.trim();
+    const jumlah = parseInt(r.querySelector('.ms-jumlah').value,10) || 0;
+    if(nama && jumlah>0) rincian.push({nama, jumlah, nilai:nil.value});
+  });
+  return {rincian, error};
+}
+// Ringkasan nilai untuk Rekap & total filter: hanya trip yang punya nilai yang dijumlahkan.
+function nilaiRingkasHtml(r){
+  if(!r.trip) return 'Nilai transaksi: <b>-</b>';
+  if(r.tripBernilai===0) return 'Nilai transaksi: <b>-</b> <span>· belum ada trip yang diisi nilainya</span>';
+  const kosong = r.trip - r.tripBernilai;
+  return `Nilai transaksi: <b>${fmtRp(r.nilai)}</b>` +
+    (kosong>0 ? ` <span>· ${kosong} dari ${r.trip} trip belum memiliki nilai transaksi</span>` : '');
+}
+function nilaiStatHtml(t){
+  const n = nilaiTripOf(t);
+  return `<div class="trip-stat"><span class="t-label">Nilai</span><span class="t-value num-mono">${n===null ? '-' : fmtRp(n)}</span></div>`;
+}
+// Rincian nilai per cafe — hanya untuk trip banyak tujuan yang rincinya tersimpan.
+function nilaiRincianHtml(t){
+  if(!Array.isArray(t.rincianTujuan) || t.rincianTujuan.length<2) return '';
+  return `<div class="nilai-rincian">${t.rincianTujuan.map(r=>
+    `<span>${escapeHtml(r.nama)} <b>${typeof r.nilai==='number' ? fmtRp(r.nilai) : '-'}</b></span>`).join('')}</div>`;
+}
+
+// Analisis periode: hanya trip bernilai yang masuk total & rata-rata.
+function hitungNilaiPeriode(dari, sampai){
+  const r = hitungRekap(tripsAktif().filter(t=> (!dari || t.tanggal>=dari) && (!sampai || t.tanggal<=sampai)));
+  return {trip:r.trip, tripBernilai:r.tripBernilai, total:r.nilai,
+    rata: r.tripBernilai>0 ? Math.round(r.nilai/r.tripBernilai) : null};
+}
+// Daftar bulan 'YYYY-MM' dari awal s.d. akhir periode (maks. 12 bulan terakhir).
+function daftarBulan(dari, sampai){
+  const out = [];
+  let y = parseInt(dari.slice(0,4),10), m = parseInt(dari.slice(5,7),10);
+  const akhir = parseInt(sampai.slice(0,4),10)*12 + parseInt(sampai.slice(5,7),10);
+  while(y*12+m <= akhir){
+    out.push(`${y}-${pad(m)}`);
+    m++; if(m>12){ m=1; y++; }
+  }
+  return out.slice(-12);
+}
+function bulanSebelumnya(bln){
+  let y = parseInt(bln.slice(0,4),10), m = parseInt(bln.slice(5,7),10) - 1;
+  if(m===0){ m=12; y--; }
+  return `${y}-${pad(m)}`;
+}
+// Total nilai & jumlah transaksi per bulan. Bulan tanpa trip bernilai -> nilai null (bukan Rp 0).
+function hitungBulanan(daftar){
+  const aktif = tripsAktif();
+  return daftar.map(bln=>{
+    const list = aktif.filter(t=>t.tanggal.slice(0,7)===bln);
+    const r = hitungRekap(list);
+    let transaksi = 0;
+    list.forEach(t=>getRincian(t).list.forEach(x=>{ if(x.nama && x.jumlah) transaksi += x.jumlah; }));
+    return {bulan:bln, trip:r.trip, tripBernilai:r.tripBernilai, nilai: r.tripBernilai>0 ? r.nilai : null, transaksi};
+  });
+}
+// Perubahan nilai dibanding pembanding: persen (dari pembanding) dan selisih Rp.
+function bandingHtml(sekarang, pembanding){
+  const selisih = sekarang - pembanding;
+  if(selisih===0) return '<span class="trend-flat">0%</span> <span class="num-mono">(Rp 0)</span>';
+  const naik = selisih>0;
+  const pct = pembanding>0 ? `${Math.abs(Math.round(selisih/pembanding*100))}%` : '–';
+  return `<span class="${naik?'trend-up':'trend-down'}">${svgIcon(naik?'trend-up':'trend-down')}${pct}</span> ` +
+    `<span class="num-mono">(${naik?'+':'-'}${fmtRp(Math.abs(selisih))})</span>`;
+}
+
+// ---------- Toast (menggantikan alert() bawaan browser) ----------
+function showToast(msg, tipe){
+  const t=document.getElementById('toast');
+  const isErr = tipe==='error';
+  t.innerHTML = `<span class="t-icn">${svgIcon(isErr?'alert':'check')}</span><span>${escapeHtml(msg)}</span>`;
+  t.classList.toggle('toast-error', isErr);
+  t.classList.toggle('toast-success', !isErr);
+  t.classList.add('show');
+  clearTimeout(showToast._tm);
+  showToast._tm=setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+// ---------- Indikator loading pada tombol ----------
+function setBtnBusy(btn, busy, opts){
+  opts = opts || {};
+  const isDark = opts.dark !== undefined ? opts.dark : !btn.classList.contains('btn-primary');
+  if(busy){
+    if(btn.dataset.busy==='1') return;
+    btn.dataset.busy='1';
+    btn.dataset.originalHtml = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spinner${isDark?' dark':''}"></span>${opts.text||'Memproses…'}`;
+  } else {
+    btn.dataset.busy='0';
+    btn.disabled = false;
+    if(btn.dataset.originalHtml !== undefined){ btn.innerHTML = btn.dataset.originalHtml; }
+  }
+}
+
+// ---------- Modal konfirmasi (menggantikan confirm() bawaan browser) ----------
+// Dipakai untuk semua aksi merusak/tidak bisa dibatalkan: hapus, hapus permanen,
+// kosongkan sampah, hapus favorit, daftar akun, keluar, & impor backup.
+// Sengaja TIDAK dipasang di "Simpan Trip"/"Simpan Perubahan" — dua aksi itu paling
+// sering dipakai tiap hari, dan menambah dialog konfirmasi di sana justru
+// memperlambat pemakaian berulang tanpa menambah keamanan data (trip masih bisa
+// dihapus/dipulihkan lewat tempat sampah kalau memang keliru).
+function confirmModal(opts){
+  opts = opts || {};
+  return new Promise((resolve)=>{
+    const backdrop = document.getElementById('confirmModal');
+    const iconWrap = document.getElementById('confirmIcon');
+    const okBtn = document.getElementById('confirmBtnOk');
+    const cancelBtn = document.getElementById('confirmBtnCancel');
+    const danger = opts.danger !== false;
+
+    document.getElementById('confirmTitle').textContent = opts.title || 'Yakin?';
+    document.getElementById('confirmMsg').textContent = opts.message || '';
+    okBtn.textContent = opts.okText || 'Konfirmasi';
+    cancelBtn.textContent = opts.cancelText || 'Batal';
+    okBtn.className = 'btn ' + (danger ? 'btn-danger' : 'btn-primary');
+    iconWrap.className = 'confirm-icon ' + (danger ? 'tone-danger' : 'tone-brand');
+    iconWrap.innerHTML = svgIcon(danger ? 'alert' : 'check');
+
+    function cleanup(result){
+      backdrop.classList.remove('show');
+      okBtn.removeEventListener('click', onOk);
+      cancelBtn.removeEventListener('click', onCancel);
+      backdrop.removeEventListener('click', onBackdrop);
+      document.removeEventListener('keydown', onKey);
+      resolve(result);
+    }
+    function onOk(){ cleanup(true); }
+    function onCancel(){ cleanup(false); }
+    function onBackdrop(e){ if(e.target===backdrop) cleanup(false); }
+    function onKey(e){ if(e.key==='Escape') cleanup(false); }
+
+    okBtn.addEventListener('click', onOk);
+    cancelBtn.addEventListener('click', onCancel);
+    backdrop.addEventListener('click', onBackdrop);
+    document.addEventListener('keydown', onKey);
+    backdrop.classList.add('show');
+    setTimeout(()=>cancelBtn.focus(), 60);
+  });
+}
+
+// ---------- Tema terang/gelap ----------
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('themeToggle').setAttribute('aria-pressed', theme==='dark' ? 'true':'false');
+}
+document.getElementById('themeToggle').addEventListener('click', function(){
+  const next = document.documentElement.getAttribute('data-theme')==='dark' ? 'light' : 'dark';
+  try{ localStorage.setItem('themeNo8', next); }catch(e){}
+  applyTheme(next);
+});
+applyTheme(document.documentElement.getAttribute('data-theme') || 'light');
+
+// ---------- Auth ----------
+function pesanErrorAuth(err){
+  const map = {
+    'auth/invalid-email':'Format email tidak valid.',
+    'auth/missing-password':'Password belum diisi.',
+    'auth/weak-password':'Password minimal 6 karakter.',
+    'auth/email-already-in-use':'Email ini sudah terdaftar — coba tombol Masuk.',
+    'auth/invalid-credential':'Email atau password salah.',
+    'auth/wrong-password':'Email atau password salah.',
+    'auth/user-not-found':'Akun belum terdaftar — coba tombol Daftar Akun Baru.',
+    'auth/too-many-requests':'Terlalu banyak percobaan, coba lagi sebentar.',
+    'auth/network-request-failed':'Koneksi internet bermasalah.',
+    'auth/configuration-not-found':'Login Email/Password belum diaktifkan di Firebase Console (Authentication > Sign-in method).',
+    'auth/api-key-not-valid':'Konfigurasi Firebase (apiKey dkk) di file ini belum diisi/salah.'
+  };
+  return map[err.code] || ('Gagal: ' + err.message);
+}
+
+function pesanErrorFirestore(err, aksi){
+  const map = {
+    'permission-denied':'tidak diizinkan (coba masuk ulang)',
+    'unavailable':'server tidak bisa dihubungi (cek koneksi internet)',
+    'resource-exhausted':'terlalu banyak data diproses sekaligus, coba lagi',
+    'unauthenticated':'sesi login berakhir (coba masuk ulang)'
+  };
+  const sebab = map[err.code] || 'cek koneksi internet';
+  return `Gagal ${aksi} — ${sebab}`;
+}
+
+function setAuthMsg(box, msg, tipe){
+  box.classList.toggle('is-ok', tipe==='ok');
+  box.innerHTML = msg ? svgIcon(tipe==='ok' ? 'check' : 'alert') + `<span>${escapeHtml(msg)}</span>` : '';
+}
+
+document.getElementById('btnMasuk').addEventListener('click', async function(){
+  const email = document.getElementById('auth-email').value.trim();
+  const pass = document.getElementById('auth-pass').value;
+  const errBox = document.getElementById('authError');
+  setAuthMsg(errBox, '');
+  if(!email || !pass){ setAuthMsg(errBox, 'Isi email & password dulu ya.', 'error'); return; }
+  setBtnBusy(this, true, {text:'Memproses…'});
+  try{
+    await signInWithEmailAndPassword(auth, email, pass);
+  }catch(err){
+    setAuthMsg(errBox, pesanErrorAuth(err), 'error');
+  }finally{
+    setBtnBusy(this, false);
+  }
+});
+
+document.getElementById('btnDaftar').addEventListener('click', async function(){
+  const email = document.getElementById('auth-email').value.trim();
+  const pass = document.getElementById('auth-pass').value;
+  const errBox = document.getElementById('authError');
+  setAuthMsg(errBox, '');
+  if(!email || !pass){ setAuthMsg(errBox, 'Isi email & password dulu ya.', 'error'); return; }
+  const ok = await confirmModal({
+    title:'Daftar akun baru?',
+    message:`Daftar dengan email ${email}. Pastikan ini email milikmu sendiri — akun inilah yang nanti dipakai login di semua perangkat (HP & laptop) supaya datanya sinkron.`,
+    okText:'Daftar', danger:false
+  });
+  if(!ok) return;
+  setBtnBusy(this, true, {text:'Memproses…'});
+  try{
+    await createUserWithEmailAndPassword(auth, email, pass);
+  }catch(err){
+    setAuthMsg(errBox, pesanErrorAuth(err), 'error');
+  }finally{
+    setBtnBusy(this, false);
+  }
+});
+
+document.getElementById('btnLupaPassword').addEventListener('click', async function(){
+  const email = document.getElementById('auth-email').value.trim();
+  const errBox = document.getElementById('authError');
+  if(!email){
+    setAuthMsg(errBox, 'Isi email dulu di kolom atas, baru tekan tombol ini.', 'error');
+    return;
+  }
+  setBtnBusy(this, true, {text:'Mengirim…', dark:true});
+  try{
+    await sendPasswordResetEmail(auth, email);
+    setAuthMsg(errBox, 'Link reset password sudah dikirim ke ' + email + ' — cek inbox/folder spam.', 'ok');
+  }catch(err){
+    setAuthMsg(errBox, pesanErrorAuth(err), 'error');
+  }finally{
+    setBtnBusy(this, false);
+  }
+});
+
+document.getElementById('btnKeluar').addEventListener('click', async ()=>{
+  const ok = await confirmModal({
+    title:'Keluar dari akun ini?',
+    message:'Kamu bisa masuk lagi kapan saja pakai email & password yang sama.',
+    okText:'Keluar', danger:false
+  });
+  if(!ok) return;
+  await signOut(auth);
+});
+
+onAuthStateChanged(auth, (user)=>{
+  document.getElementById('bootLoading').style.display = 'none';
+  if(unsubTrips){ unsubTrips(); unsubTrips=null; }
+  if(unsubFavs){ unsubFavs(); unsubFavs=null; }
+
+  if(user){
+    currentUser = user;
+    document.getElementById('authGate').style.display = 'none';
+    document.getElementById('appContent').style.display = '';
+    document.getElementById('userBar').style.display = 'flex';
+    document.getElementById('userEmailLabel').textContent = 'Masuk sebagai ' + user.email;
+    document.getElementById('auth-email').value = '';
+    document.getElementById('auth-pass').value = '';
+    document.getElementById('authError').textContent = '';
+    mulaiSinkronisasi();
+  } else {
+    currentUser = null;
+    trips = []; favs = [];
+    renderAll(); // kosongkan tampilan lama supaya tidak sempat kelihatan kalau user lain login di device yang sama
+    document.getElementById('appContent').style.display = 'none';
+    document.getElementById('userBar').style.display = 'none';
+    document.getElementById('authGate').style.display = '';
+  }
+});
+
+// ---------- Referensi Firestore ----------
+function tripsCol(){ return collection(db, 'users', currentUser.uid, 'trips'); }
+function tripDoc(id){ return doc(db, 'users', currentUser.uid, 'trips', id); }
+function favsCol(){ return collection(db, 'users', currentUser.uid, 'favorites'); }
+function favDoc(id){ return doc(db, 'users', currentUser.uid, 'favorites', id); }
+
+function mulaiSinkronisasi(){
+  migrasiFavoritLama();
+  unsubTrips = onSnapshot(tripsCol(), (snap)=>{
+    trips = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+    renderAll();
+  }, (err)=>{
+    console.error(err);
+    showToast(pesanErrorFirestore(err, 'memuat data'), 'error');
+  });
+
+  unsubFavs = onSnapshot(favsCol(), (snap)=>{
+    favs = snap.docs.map(d=>({ id:d.id, ...d.data() })).sort((a,b)=>a.nama.localeCompare(b.nama));
+    renderFavList();
+  }, (err)=>{
+    console.error(err);
+    showToast(pesanErrorFirestore(err, 'memuat favorit'), 'error');
+  });
+}
+
+async function migrasiFavoritLama(){
+  try{
+    const oldRef = doc(db, 'users', currentUser.uid, 'meta', 'favorites');
+    const oldSnap = await getDoc(oldRef);
+    const oldList = oldSnap.exists() && Array.isArray(oldSnap.data().list) ? oldSnap.data().list : [];
+    if(oldList.length===0) return;
+    const existing = await getDocs(favsCol());
+    if(!existing.empty) return;
+    const batch = writeBatch(db);
+    oldList.forEach(f=>{
+      const jarak = parseFloat(f && f.jarak);
+      if(f && f.nama && !isNaN(jarak)){
+        batch.set(doc(favsCol()), { nama:f.nama, jarak });
+      }
+    });
+    await batch.commit();
+  }catch(err){
+    console.error('Migrasi favorit lama gagal (tidak fatal):', err);
+  }
+}
+
+// ---------- Tujuan Favorit ----------
+let editingFavId = null;
+
+function renderFavList(){
+  const box=document.getElementById('listFavorit');
+  if(favs.length===0){
+    box.innerHTML='<div class="hint-text" style="margin:0;">Belum ada tujuan favorit.</div>';
+    return;
+  }
+  box.innerHTML='';
+  favs.forEach((f)=>{
+    const row=document.createElement('div');
+    row.className='fav-item';
+
+    if(editingFavId===f.id){
+      row.style.cssText='display:flex;flex-direction:column;align-items:stretch;gap:8px;background:var(--surface);border:1px solid var(--line-strong);';
+      const fieldWrap=document.createElement('div');
+      fieldWrap.className='row2';
+      fieldWrap.innerHTML=`
+        <div><input type="text" class="fav-edit-nama" value="${escapeHtml(f.nama)}" placeholder="Nama tujuan"></div>
+        <div><input type="number" class="fav-edit-jarak" value="${f.jarak}" step="0.1" min="0" placeholder="Jarak 1 arah (km)"></div>`;
+      row.appendChild(fieldWrap);
+
+      const btnWrap=document.createElement('div');
+      btnWrap.style.cssText='display:flex;gap:6px;';
+      const btnSimpan=document.createElement('button');
+      btnSimpan.className='btn btn-primary btn-sm';
+      btnSimpan.style.flex='1';
+      btnSimpan.textContent='Simpan';
+      btnSimpan.onclick=async ()=>{
+        const namaBaru=fieldWrap.querySelector('.fav-edit-nama').value.trim();
+        const jarakBaru=parseFloat(fieldWrap.querySelector('.fav-edit-jarak').value);
+        if(!namaBaru || isNaN(jarakBaru) || jarakBaru<=0){ showToast('Isi nama & jarak dengan benar'); return; }
+        setBtnBusy(btnSimpan, true, {text:'Menyimpan…'});
+        try{
+          await updateDoc(favDoc(f.id), {nama:namaBaru, jarak:jarakBaru});
+          editingFavId = null;
+          showToast('Favorit diperbarui');
+        }catch(err){
+          console.error(err);
+          showToast(pesanErrorFirestore(err, 'menyimpan favorit'), 'error');
+        }finally{
+          setBtnBusy(btnSimpan, false);
+          renderFavList();
+        }
+      };
+      const btnBatal=document.createElement('button');
+      btnBatal.className='btn btn-secondary btn-sm';
+      btnBatal.style.flex='1';
+      btnBatal.textContent='Batal';
+      btnBatal.onclick=()=>{ editingFavId=null; renderFavList(); };
+      btnWrap.appendChild(btnSimpan);
+      btnWrap.appendChild(btnBatal);
+      row.appendChild(btnWrap);
+    } else {
+      row.innerHTML = `<span class="fav-icon">${svgIcon('pin')}</span>`+
+        `<span class="fav-name">${escapeHtml(f.nama)}</span>`+
+        `<span class="fav-dist num-mono">${fmtKm(f.jarak)} km &middot; PP ${fmtKm(f.jarak*2)}</span>`;
+      const btnWrap=document.createElement('div');
+      btnWrap.style.cssText='display:flex;gap:6px;flex:none;';
+      const btnEdit=document.createElement('button');
+      btnEdit.className='icon-btn-ghost';
+      btnEdit.setAttribute('aria-label','Edit '+f.nama);
+      btnEdit.innerHTML=svgIcon('edit');
+      btnEdit.onclick=()=>{ editingFavId=f.id; renderFavList(); };
+      const btnDel=document.createElement('button');
+      btnDel.className='icon-btn-ghost danger';
+      btnDel.setAttribute('aria-label','Hapus '+f.nama);
+      btnDel.innerHTML=svgIcon('trash');
+      btnDel.onclick=async ()=>{
+        const ok = await confirmModal({
+          title:'Hapus favorit ini?',
+          message:`"${f.nama}" akan dihapus dari daftar tujuan favorit. Jarak otomatis untuk tujuan ini tidak akan terisi lagi di form Tambah Trip.`,
+          okText:'Hapus', danger:true
+        });
+        if(!ok) return;
+        try{
+          await deleteDoc(favDoc(f.id));
+          showToast('Favorit dihapus');
+        }catch(err){
+          console.error(err);
+          showToast(pesanErrorFirestore(err, 'menghapus favorit'), 'error');
+        }
+      };
+      btnWrap.appendChild(btnEdit);
+      btnWrap.appendChild(btnDel);
+      row.appendChild(btnWrap);
+    }
+    box.appendChild(row);
+  });
+}
+
+async function tambahFavorit(){
+  const nama=document.getElementById('fav-nama').value.trim();
+  const jarak=parseFloat(document.getElementById('fav-jarak').value);
+  if(!nama || isNaN(jarak) || jarak<=0){
+    showToast('Isi nama & jarak dulu ya');
+    return;
+  }
+  const btn=document.getElementById('btnTambahFavorit');
+  setBtnBusy(btn, true, {text:'Menyimpan…'});
+  try{
+    await addDoc(favsCol(), {nama, jarak});
+    document.getElementById('fav-nama').value='';
+    document.getElementById('fav-jarak').value='';
+    showToast('Favorit ditambahkan');
+  }catch(err){
+    console.error(err);
+    showToast(pesanErrorFirestore(err, 'menyimpan favorit'), 'error');
+  }finally{
+    setBtnBusy(btn, false);
+  }
+}
+
+document.getElementById('f-tujuan').addEventListener('change', function(){
+  const match = favs.find(f=>f.nama.toLowerCase()===this.value.trim().toLowerCase());
+  const jarakField = document.getElementById('f-jarak');
+  const note = document.getElementById('f-tujuan-note');
+  if(match){
+    jarakField.value = match.jarak*2;
+    note.innerHTML = svgIcon('check')+`<span>Jarak PP otomatis dari favorit: ${fmtKm(match.jarak*2)} km — beda rute? ubah manual di kolom jarak.</span>`;
+  } else {
+    note.innerHTML='';
+  }
+});
+
+document.getElementById('edit-tujuan').addEventListener('change', function(){
+  const match = favs.find(f=>f.nama.toLowerCase()===this.value.trim().toLowerCase());
+  if(match){ document.getElementById('edit-jarak').value = match.jarak*2; }
+});
+
+// ---------- Dropdown pilihan tujuan favorit ----------
+function setupTujuanAutocomplete(input, opts){
+  opts = opts || {};
+  const wrap = document.createElement('div');
+  wrap.className = 'ac-wrap';
+  if(opts.flexItem){ wrap.style.flex='1'; wrap.style.minWidth='0'; }
+  input.parentNode.insertBefore(wrap, input);
+  wrap.appendChild(input);
+  const box = document.createElement('div');
+  box.className = 'fav-suggest';
+  wrap.appendChild(box);
+
+  function renderSuggest(){
+    if(favs.length===0){ box.classList.remove('show'); return; }
+    const q = input.value.trim().toLowerCase();
+    const matches = favs.filter(f=> f.nama.toLowerCase().includes(q));
+    if(matches.length===0){ box.classList.remove('show'); box.innerHTML=''; return; }
+    box.innerHTML = matches.map(f=>
+      `<div class="fav-suggest-item" data-nama="${escapeHtml(f.nama)}"><span class="fs-name">${escapeHtml(f.nama)}</span><span class="fs-dist">${fmtKm(f.jarak*2)} km PP</span></div>`
+    ).join('');
+    box.querySelectorAll('.fav-suggest-item').forEach(item=>{
+      item.addEventListener('mousedown', function(e){
+        e.preventDefault();
+        input.value = this.dataset.nama;
+        input.dispatchEvent(new Event('change', {bubbles:true}));
+        box.classList.remove('show');
+      });
+    });
+    box.classList.add('show');
+  }
+
+  input.addEventListener('focus', renderSuggest);
+  input.addEventListener('input', renderSuggest);
+  input.addEventListener('blur', ()=>{ setTimeout(()=> box.classList.remove('show'), 150); });
+}
+
+setupTujuanAutocomplete(document.getElementById('f-tujuan'));
+setupTujuanAutocomplete(document.getElementById('edit-tujuan'));
+pasangFormatRupiah(document.getElementById('f-nilai'));
+pasangFormatRupiah(document.getElementById('edit-nilai'));
+
+// ---------- Mode: 1 tujuan vs banyak tujuan ----------
+function setMode(mode){
+  currentMode = mode;
+  document.getElementById('modeBtnSingle').classList.toggle('active', mode==='single');
+  document.getElementById('modeBtnMulti').classList.toggle('active', mode==='multi');
+  document.getElementById('singleTujuanWrap').style.display = mode==='single' ? '' : 'none';
+  document.getElementById('multiTujuanWrap').style.display = mode==='multi' ? '' : 'none';
+
+  const jumlahField = document.getElementById('f-jumlah');
+  if(mode==='multi'){
+    jumlahField.readOnly = true;
+    jumlahField.style.background = 'var(--paper-2)';
+    if(document.getElementById('multiStopList').children.length===0){
+      tambahBarisStop();
+      tambahBarisStop();
+    }
+    hitungJumlahMulti();
+  } else {
+    jumlahField.readOnly = false;
+    jumlahField.style.background = '';
+  }
+}
+
+// tambahBarisStop & hitungJumlahMulti dipakai baik oleh form Tambah Trip maupun
+// modal Edit — makanya container & targetFieldId bisa dioper; kalau tidak
+// dioper (dipanggil dari onclick="tambahBarisStop()" di form Tambah Trip),
+// otomatis pakai target form Tambah Trip seperti semula.
+function tambahBarisStop(nama, jumlah, container, targetFieldId, nilai){
+  nama = nama || '';
+  nilai = (typeof nilai==='number') ? nilai : null;
+  jumlah = jumlah || 1;
+  container = container || document.getElementById('multiStopList');
+  targetFieldId = targetFieldId || 'f-jumlah';
+  const row = document.createElement('div');
+  row.className = 'ms-row';
+  row.innerHTML = `
+    <input type="text" class="ms-tujuan" placeholder="mis. Anak Panah Coffee" value="${escapeHtml(nama)}">
+    <input type="number" class="ms-jumlah" min="1" step="1" value="${jumlah}" title="Jumlah transaksi di tujuan ini" aria-label="Jumlah transaksi di tujuan ini">
+    <input type="text" class="ms-nilai" inputmode="numeric" autocomplete="off" placeholder="Nilai transaksi (Rp), opsional" value="${nilai===null ? '' : fmtRibuan(nilai)}" title="Nilai transaksi di tujuan ini (opsional)" aria-label="Nilai transaksi di tujuan ini (opsional)">
+    <button type="button" aria-label="Hapus tujuan ini">${svgIcon('x')}</button>
+  `;
+  const recalc = ()=>hitungJumlahMulti(container, targetFieldId);
+  row.querySelector('button').onclick = ()=>{ row.remove(); recalc(); };
+  const inputTujuan = row.querySelector('.ms-tujuan');
+  inputTujuan.addEventListener('input', recalc);
+  row.querySelector('.ms-jumlah').addEventListener('input', recalc);
+  pasangFormatRupiah(row.querySelector('.ms-nilai'));
+  row.querySelector('.ms-nilai').addEventListener('input', recalc);
+  container.appendChild(row);
+  setupTujuanAutocomplete(inputTujuan, {flexItem:true});
+  recalc();
+}
+
+function hitungJumlahMulti(container, targetFieldId){
+  container = container || document.getElementById('multiStopList');
+  targetFieldId = targetFieldId || 'f-jumlah';
+  const rows = Array.from(container.querySelectorAll('.ms-row'));
+  const total = rows.reduce((sum,row)=>{
+    const nama = row.querySelector('.ms-tujuan').value.trim();
+    const jml = parseInt(row.querySelector('.ms-jumlah').value,10);
+    return (nama && jml>0) ? sum+jml : sum;
+  }, 0);
+  document.getElementById(targetFieldId).value = total;
+  // Total nilai trip ini (live) di bawah daftar tujuan; kosong kalau belum ada nilai yang diisi.
+  let nilaiSum = 0, ada = false;
+  rows.forEach(row=>{
+    const nil = parseRupiah(row.querySelector('.ms-nilai').value);
+    if(nil.value!==null){ nilaiSum += nil.value; ada = true; }
+  });
+  const hint = container.parentElement && container.parentElement.querySelector('.ms-nilai-total');
+  if(hint) hint.textContent = ada ? `Total nilai trip ini: ${fmtRp(nilaiSum)}` : '';
+}
+
+// ---------- Trips ----------
+// rincianTujuan: [{nama, jumlah, nilai}, ...] — rincian transaksi & nilai (Rp; null = belum diisi) per tujuan dalam 1 trip,
+// dipakai untuk Laporan per Cafe. tujuan (string gabungan) & jumlah (total) tetap
+// disimpan seperti semula supaya semua fitur lama (ringkasan, riwayat, CSV) tidak perlu berubah.
+async function tambahTrip(){
+  const tanggal = document.getElementById('f-tanggal').value || todayISO();
+  const waktu = document.getElementById('f-waktu').value || nowHM();
+  const catatan = document.getElementById('f-catatan').value.trim();
+
+  let tujuan, jumlah, rincianTujuan;
+  if(currentMode === 'multi'){
+    const hasil = bacaRincianMulti(document.getElementById('multiStopList'));
+    if(hasil.error){ showToast(hasil.error); return; }
+    rincianTujuan = hasil.rincian;
+    if(rincianTujuan.length===0){ showToast('Isi minimal 1 tujuan ya'); return; }
+    tujuan = rincianTujuan.map(r=>r.nama).join(', ');
+    jumlah = rincianTujuan.reduce((s,r)=>s+r.jumlah,0);
+  } else {
+    tujuan = document.getElementById('f-tujuan').value.trim();
+    jumlah = parseInt(document.getElementById('f-jumlah').value,10);
+    if(!tujuan){ showToast('Isi tujuan dulu ya'); return; }
+    if(!jumlah || jumlah<1){ showToast('Jumlah transaksi minimal 1'); return; }
+    const nil = parseRupiah(document.getElementById('f-nilai').value);
+    if(nil.error){ showToast(nil.error); return; }
+    rincianTujuan = [{nama:tujuan, jumlah, nilai:nil.value}];
+  }
+  const nilaiTotal = hitungNilaiTotal(rincianTujuan);
+
+  const jarak = parseFloat(document.getElementById('f-jarak').value);
+  if(isNaN(jarak) || jarak<0){ showToast('Isi jarak PP dulu ya'); return; }
+
+  const btn = document.getElementById('btnSimpanTrip');
+  setBtnBusy(btn, true, {text:'Menyimpan…'});
+  try{
+    await addDoc(tripsCol(), {
+      tanggal, waktu, tujuan, jumlah, jarak, catatan, rincianTujuan, nilaiTotal,
+      trashed:false, deletedAt:null, createdAt: serverTimestamp()
+    });
+    resetTambahTripForm();
+    showToast('Trip tersimpan');
+  }catch(err){
+    console.error(err);
+    showToast(pesanErrorFirestore(err, 'menyimpan trip'), 'error');
+  }finally{
+    setBtnBusy(btn, false);
+  }
+}
+
+// Rincian per-tujuan untuk trip lama (sebelum fitur ini ada) tidak tersimpan —
+// di sini direkonstruksi: kalau namanya tunggal ya langsung dipakai, kalau
+// gabungan (trip banyak-tujuan lama) dibagi rata sebagai estimasi supaya
+// Laporan per Cafe tetap bisa menghitung trip lama, ditandai estimasi di UI.
+function getRincian(trip){
+  if(Array.isArray(trip.rincianTujuan) && trip.rincianTujuan.length>0) return {list:trip.rincianTujuan, estimasi:false};
+  const parts = String(trip.tujuan).split(',').map(s=>s.trim()).filter(Boolean);
+  if(parts.length<=1) return {list:[{nama:trip.tujuan, jumlah:trip.jumlah}], estimasi:false};
+  const basis = Math.floor(trip.jumlah/parts.length);
+  const sisa = trip.jumlah - basis*parts.length;
+  return {list:parts.map((nama,i)=>({nama, jumlah:basis+(i<sisa?1:0)})), estimasi:true};
+}
+
+function resetTambahTripForm(){
+  document.getElementById('f-tujuan').value='';
+  document.getElementById('f-tujuan-note').innerHTML='';
+  document.getElementById('f-jarak').value='';
+  document.getElementById('f-catatan').value='';
+  document.getElementById('f-nilai').value='';
+  document.getElementById('multiStopList').innerHTML='';
+  if(currentMode==='multi'){
+    tambahBarisStop();
+    tambahBarisStop();
+    hitungJumlahMulti();
+  } else {
+    document.getElementById('f-jumlah').value='1';
+  }
+  setDefaultDateTime();
+}
+
+async function hapusTrip(id){
+  const ok = await confirmModal({
+    title:'Pindahkan ke tempat sampah?',
+    message:'Trip ini akan dipindah ke tempat sampah dan masih bisa dipulihkan lagi nanti kalau berubah pikiran.',
+    okText:'Pindahkan', danger:true
+  });
+  if(!ok) return;
+  try{
+    await updateDoc(tripDoc(id), { trashed:true, deletedAt: new Date().toISOString() });
+    showToast('Trip dipindah ke tempat sampah');
+  }catch(err){
+    console.error(err);
+    showToast(pesanErrorFirestore(err, 'memindahkan ke sampah'), 'error');
+  }
+}
+
+async function pulihkanTrip(id){
+  try{
+    await updateDoc(tripDoc(id), { trashed:false, deletedAt:null });
+    showToast('Trip dipulihkan');
+  }catch(err){
+    console.error(err);
+    showToast(pesanErrorFirestore(err, 'memulihkan trip'), 'error');
+  }
+}
+
+async function hapusPermanen(id){
+  const ok = await confirmModal({
+    title:'Hapus permanen?',
+    message:'Data trip ini akan dihapus dan tidak bisa dikembalikan lagi.',
+    okText:'Hapus Permanen', danger:true
+  });
+  if(!ok) return;
+  try{
+    await deleteDoc(tripDoc(id));
+    showToast('Trip dihapus permanen');
+  }catch(err){
+    console.error(err);
+    showToast(pesanErrorFirestore(err, 'menghapus permanen'), 'error');
+  }
+}
+
+// ---------- Edit Trip ----------
+let editingTripId = null;
+let editModeMulti = false;
+
+function bukaEditTrip(id){
+  const t = trips.find(x=>x.id===id);
+  if(!t) return;
+  editingTripId = id;
+  document.getElementById('edit-tanggal').value = t.tanggal;
+  document.getElementById('edit-waktu').value = t.waktu;
+  document.getElementById('edit-catatan').value = t.catatan || '';
+  document.getElementById('edit-jarak').value = t.jarak;
+
+  const rincian = getRincian(t).list;
+  editModeMulti = rincian.length > 1;
+  document.getElementById('edit-singleTujuanWrap').style.display = editModeMulti ? 'none' : '';
+  document.getElementById('edit-multiTujuanWrap').style.display = editModeMulti ? '' : 'none';
+  document.getElementById('edit-singleNilaiWrap').style.display = editModeMulti ? 'none' : '';
+  const editJumlahField = document.getElementById('edit-jumlah');
+
+  if(editModeMulti){
+    const editList = document.getElementById('edit-multiStopList');
+    editList.innerHTML = '';
+    rincian.forEach(r=> tambahBarisStop(r.nama, r.jumlah, editList, 'edit-jumlah', r.nilai) );
+    editJumlahField.readOnly = true;
+    editJumlahField.style.background = 'var(--paper-2)';
+  } else {
+    document.getElementById('edit-tujuan').value = t.tujuan;
+    const nilaiSingle = nilaiTripOf(t);
+    document.getElementById('edit-nilai').value = nilaiSingle===null ? '' : fmtRibuan(nilaiSingle);
+    editJumlahField.value = t.jumlah;
+    editJumlahField.readOnly = false;
+    editJumlahField.style.background = '';
+  }
+  document.getElementById('editModal').classList.add('show');
+}
+
+function tutupModalEdit(){
+  document.getElementById('editModal').classList.remove('show');
+  document.getElementById('edit-multiStopList').innerHTML = '';
+  editingTripId = null;
+}
+
+document.getElementById('editModal').addEventListener('click', function(e){
+  if(e.target===this) tutupModalEdit();
+});
+document.addEventListener('keydown', function(e){
+  if(e.key==='Escape' && document.getElementById('editModal').classList.contains('show')) tutupModalEdit();
+});
+
+async function simpanEditTrip(){
+  if(!editingTripId) return;
+  const tanggal = document.getElementById('edit-tanggal').value;
+  const waktu = document.getElementById('edit-waktu').value;
+  const catatan = document.getElementById('edit-catatan').value.trim();
+  const jarak = parseFloat(document.getElementById('edit-jarak').value);
+
+  let tujuan, jumlah, rincianTujuan;
+  if(editModeMulti){
+    const hasil = bacaRincianMulti(document.getElementById('edit-multiStopList'));
+    if(hasil.error){ showToast(hasil.error); return; }
+    rincianTujuan = hasil.rincian;
+    if(rincianTujuan.length===0){ showToast('Isi minimal 1 tujuan ya'); return; }
+    tujuan = rincianTujuan.map(r=>r.nama).join(', ');
+    jumlah = rincianTujuan.reduce((s,r)=>s+r.jumlah,0);
+  } else {
+    tujuan = document.getElementById('edit-tujuan').value.trim();
+    jumlah = parseInt(document.getElementById('edit-jumlah').value,10);
+    if(!tujuan){ showToast('Isi tujuan dulu ya'); return; }
+    if(!jumlah || jumlah<1){ showToast('Jumlah transaksi minimal 1'); return; }
+    const nil = parseRupiah(document.getElementById('edit-nilai').value);
+    if(nil.error){ showToast(nil.error); return; }
+    rincianTujuan = [{nama:tujuan, jumlah, nilai:nil.value}];
+  }
+  const nilaiTotal = hitungNilaiTotal(rincianTujuan);
+
+  if(!tanggal || !waktu){ showToast('Isi tanggal & jam dulu ya'); return; }
+  if(isNaN(jarak) || jarak<0){ showToast('Isi jarak PP dulu ya'); return; }
+
+  const btn = document.getElementById('btnSimpanEdit');
+  setBtnBusy(btn, true, {text:'Menyimpan…'});
+  try{
+    await updateDoc(tripDoc(editingTripId), { tanggal, waktu, tujuan, jumlah, jarak, catatan, rincianTujuan, nilaiTotal });
+    showToast('Perubahan disimpan');
+    tutupModalEdit();
+  }catch(err){
+    console.error(err);
+    showToast(pesanErrorFirestore(err, 'menyimpan perubahan'), 'error');
+  }finally{
+    setBtnBusy(btn, false);
+  }
+}
+
+async function kosongkanSampah(){
+  const trashed = trips.filter(t=>t.trashed);
+  if(trashed.length===0) return;
+  const ok = await confirmModal({
+    title:'Kosongkan tempat sampah?',
+    message:`Semua ${trashed.length} trip di tempat sampah akan dihapus permanen dan tidak bisa dikembalikan lagi.`,
+    okText:'Kosongkan', danger:true
+  });
+  if(!ok) return;
+  const btn = document.getElementById('btnKosongkanSampah');
+  setBtnBusy(btn, true, {text:'Mengosongkan…'});
+  try{
+    for(let i=0;i<trashed.length;i+=450){
+      const chunk = trashed.slice(i,i+450);
+      const batch = writeBatch(db);
+      chunk.forEach(t=> batch.delete(tripDoc(t.id)) );
+      await batch.commit();
+    }
+    showToast('Tempat sampah dikosongkan');
+  }catch(err){
+    console.error(err);
+    showToast(pesanErrorFirestore(err, 'mengosongkan sampah'), 'error');
+  }finally{
+    setBtnBusy(btn, false);
+  }
+}
+
+function tripsAktif(){
+  return trips.filter(t=>!t.trashed);
+}
+
+function tripsBulan(yyyyMM){
+  return tripsAktif().filter(t=>t.tanggal.slice(0,7)===yyyyMM);
+}
+
+// Tujuan multi-stop disimpan sebagai satu string dipisah koma (mis. "Cafe A, Cafe
+// B") — di sini murni ditampilkan sebagai beberapa badge kalau lebih dari satu,
+// datanya sendiri tidak diubah/dipecah.
+function renderDestBadges(tujuanStr){
+  const parts = String(tujuanStr).split(',').map(s=>s.trim()).filter(Boolean);
+  if(parts.length<=1) return escapeHtml(tujuanStr);
+  return parts.map(p=>`<span class="dest-badge">${svgIcon('pin')}${escapeHtml(p)}</span>`).join('');
+}
+
+function renderTrash(){
+  const box = document.getElementById('listTrash');
+  const countEl = document.getElementById('trashCount');
+  const trashList = trips.filter(t=>t.trashed);
+  countEl.textContent = trashList.length ? ` (${trashList.length})` : '';
+  if(trashList.length===0){
+    box.innerHTML = '<div class="hint-text" style="margin:0;">Tempat sampah kosong.</div>';
+    return;
+  }
+  const sorted = trashList.slice().sort((a,b)=> (b.deletedAt||'').localeCompare(a.deletedAt||''));
+  box.innerHTML='';
+  sorted.forEach(t=>{
+    const d = fmtTglLong(t.tanggal);
+    const card=document.createElement('div');
+    card.className='trip-card trash-card';
+    card.innerHTML = `
+      <div class="trip-date"><span class="d-num">${d.num}</span><span class="d-mon">${d.mon}</span></div>
+      <div class="trip-body">
+        <div class="trip-top"><div class="trip-dest">${renderDestBadges(t.tujuan)}</div></div>
+        <div class="trip-stats">
+          <div class="trip-stat"><span class="t-label">Transaksi</span><span class="t-value num-mono">${t.jumlah}</span></div>
+          <div class="trip-stat"><span class="t-label">Jarak PP</span><span class="t-value num-mono">${fmtKm(t.jarak)} km</span></div>
+          ${nilaiStatHtml(t)}
+        </div>
+        ${nilaiRincianHtml(t)}
+      </div>
+      <div class="trip-actions"></div>`;
+    const actionsEl = card.querySelector('.trip-actions');
+    const btnRestore=document.createElement('button');
+    btnRestore.className='icon-btn-ghost restore';
+    btnRestore.title='Pulihkan';
+    btnRestore.setAttribute('aria-label','Pulihkan trip ke '+t.tujuan);
+    btnRestore.innerHTML=svgIcon('undo');
+    btnRestore.onclick=()=>pulihkanTrip(t.id);
+    const btnDel=document.createElement('button');
+    btnDel.className='icon-btn-ghost danger';
+    btnDel.title='Hapus permanen';
+    btnDel.setAttribute('aria-label','Hapus permanen trip ke '+t.tujuan);
+    btnDel.innerHTML=svgIcon('trash');
+    btnDel.onclick=()=>hapusPermanen(t.id);
+    actionsEl.appendChild(btnRestore);
+    actionsEl.appendChild(btnDel);
+    box.appendChild(card);
+  });
+}
+
+// Riwayat trip — kartu, menggantikan tabel HTML lama. Kolom "Rata-rata" (km per
+// transaksi) SENGAJA tidak dipakai lagi di sini sesuai permintaan; angka
+// jarak & jumlah transaksi asli tidak berubah, cuma tidak dihitung rata-ratanya
+// buat ditampilkan. Nama fungsi tetap "renderTabel" (dipanggil dari beberapa
+// listener filter di bawah) walau sekarang keluarannya kartu, bukan <table>.
+function renderTabel(){
+  let dari = document.getElementById('filterDari').value;
+  let sampai = document.getElementById('filterSampai').value;
+  if(dari && sampai && dari > sampai){
+    [dari, sampai] = [sampai, dari];
+    document.getElementById('filterDari').value = dari;
+    document.getElementById('filterSampai').value = sampai;
+    showToast('Tanggal "Dari" & "Sampai" otomatis ditukar urutannya');
+  }
+  let list = tripsAktif().filter(t=> (!dari || t.tanggal>=dari) && (!sampai || t.tanggal<=sampai));
+
+  const rTotal = hitungRekap(list);
+  document.getElementById('totalJarakFilter').innerHTML = `${fmtKm(rTotal.jarak)} <small>km</small>`;
+  document.getElementById('totalDetailFilter').innerHTML = statChips(rTotal.trip, rTotal.jml);
+  document.getElementById('totalNilaiFilter').innerHTML = nilaiRingkasHtml(rTotal);
+
+  const tarif = parseFloat(document.getElementById('tarifKm').value);
+  const reimburseEl = document.getElementById('totalReimburseFilter');
+  if(!isNaN(tarif) && tarif>0){
+    const estimasi = Math.round(rTotal.jarak * tarif);
+    reimburseEl.textContent = `≈ Rp ${estimasi.toLocaleString('id-ID')} (tarif Rp${tarif.toLocaleString('id-ID')}/km)`;
+  } else {
+    reimburseEl.textContent = '';
+  }
+
+  list.sort((a,b)=> (b.tanggal+b.waktu).localeCompare(a.tanggal+a.waktu));
+
+  const wrap=document.getElementById('tripList');
+  const empty=document.getElementById('emptyState');
+  wrap.innerHTML='';
+  if(list.length===0){
+    empty.style.display='flex';
+    return;
+  }
+  empty.style.display='none';
+  list.forEach((t,idx)=>{
+    const d = fmtTglLong(t.tanggal);
+    const card=document.createElement('div');
+    card.className='trip-card';
+    card.style.animationDelay=(Math.min(idx,8)*0.03)+'s';
+    card.innerHTML = `
+      <div class="trip-date"><span class="d-num">${d.num}</span><span class="d-mon">${d.mon}</span></div>
+      <div class="trip-body">
+        <div class="trip-top">
+          <div class="trip-dest">${renderDestBadges(t.tujuan)}</div>
+          <span class="trip-time num-mono">${t.waktu}</span>
+        </div>
+        ${t.catatan ? `<div class="trip-note">${escapeHtml(t.catatan)}</div>` : ''}
+        <div class="trip-stats">
+          <div class="trip-stat"><span class="t-label">Transaksi</span><span class="t-value num-mono">${t.jumlah}</span></div>
+          <div class="trip-stat"><span class="t-label">Jarak PP</span><span class="t-value num-mono">${fmtKm(t.jarak)} km</span></div>
+          ${nilaiStatHtml(t)}
+        </div>
+        ${nilaiRincianHtml(t)}
+      </div>
+      <div class="trip-actions"></div>`;
+    const actionsEl = card.querySelector('.trip-actions');
+    const btnEdit=document.createElement('button');
+    btnEdit.className='icon-btn-ghost';
+    btnEdit.title='Edit trip';
+    btnEdit.setAttribute('aria-label','Edit trip ke '+t.tujuan);
+    btnEdit.innerHTML=svgIcon('edit');
+    btnEdit.onclick=()=>bukaEditTrip(t.id);
+    const btnDel=document.createElement('button');
+    btnDel.className='icon-btn-ghost danger';
+    btnDel.title='Hapus trip';
+    btnDel.setAttribute('aria-label','Hapus trip ke '+t.tujuan);
+    btnDel.innerHTML=svgIcon('trash');
+    btnDel.onclick=()=>hapusTrip(t.id);
+    actionsEl.appendChild(btnEdit);
+    actionsEl.appendChild(btnDel);
+    wrap.appendChild(card);
+  });
+}
+
+function resetFilter(){
+  document.getElementById('filterDari').value='';
+  document.getElementById('filterSampai').value='';
+  renderTabel();
+}
+document.getElementById('filterDari').addEventListener('change', renderTabel);
+document.getElementById('filterSampai').addEventListener('change', renderTabel);
+
+const tarifKmInput = document.getElementById('tarifKm');
+tarifKmInput.value = localStorage.getItem('tarifKmNo8') || '';
+tarifKmInput.addEventListener('input', function(){
+  localStorage.setItem('tarifKmNo8', this.value);
+  renderTabel();
+});
+
+function hitungRekap(list){
+  const jarak = list.reduce((s,t)=>s+t.jarak,0);
+  const jml = list.reduce((s,t)=>s+t.jumlah,0);
+  // Nilai hanya dari trip yang sudah punya nilai (null = belum diisi, bukan Rp 0).
+  const bernilai = list.filter(t=>nilaiTripOf(t)!==null);
+  const nilai = bernilai.reduce((s,t)=>s+nilaiTripOf(t),0);
+  return {jarak, jml, trip:list.length, nilai, tripBernilai:bernilai.length};
+}
+
+function renderRekap(){
+  const today = todayISO();
+  const bulanIni = today.slice(0,7);
+  const rToday = hitungRekap(tripsAktif().filter(t=>t.tanggal===today));
+  const rMonth = hitungRekap(tripsBulan(bulanIni));
+
+  document.getElementById('todayJarak').innerHTML = `${fmtKm(rToday.jarak)}<span class="unit">km</span>`;
+  document.getElementById('todayDetail').innerHTML = statChips(rToday.trip, rToday.jml);
+  document.getElementById('monthJarak').innerHTML = `${fmtKm(rMonth.jarak)}<span class="unit">km</span>`;
+  document.getElementById('monthDetail').innerHTML = statChips(rMonth.trip, rMonth.jml);
+  document.getElementById('todayNilai').innerHTML = nilaiRingkasHtml(rToday);
+  document.getElementById('monthNilai').innerHTML = nilaiRingkasHtml(rMonth);
+}
+
+// ---------- Laporan per Cafe ----------
+// Dipakai atasan untuk evaluasi: transaksi & kunjungan per cafe dalam 1 periode,
+// dibandingkan dengan periode sebelumnya yang sama panjangnya.
+let cafeSortKey = 'nilai';
+let cafeSortDir = -1; // -1 = terbesar dulu
+let cafeReportPreset = 'month';
+const AMBANG_CAFE_SEPI_HARI = 14;
+
+function normalisasiNama(nama){ return String(nama).trim().toLowerCase(); }
+
+function hitungPerCafe(dari, sampai){
+  const map = new Map();
+  tripsAktif()
+    .filter(t=> (!dari || t.tanggal>=dari) && (!sampai || t.tanggal<=sampai))
+    .forEach(t=>{
+      const {list} = getRincian(t);
+      list.forEach(r=>{
+        if(!r.nama || !r.jumlah) return;
+        const key = normalisasiNama(r.nama);
+        if(!map.has(key)) map.set(key, {nama:r.nama, transaksi:0, kunjunganSet:new Set(), jarak:0, terakhir:null, nilai:0, transaksiBernilai:0});
+        const c = map.get(key);
+        c.transaksi += r.jumlah;
+        c.kunjunganSet.add(t.id);
+        c.jarak += t.jarak;
+        // Nilai hanya dari rincian yang sudah diisi; yang kosong tidak dianggap 0.
+        if(typeof r.nilai==='number'){ c.nilai += r.nilai; c.transaksiBernilai += r.jumlah; }
+        if(!c.terakhir || t.tanggal > c.terakhir){ c.terakhir = t.tanggal; c.nama = r.nama; }
+      });
+    });
+  return Array.from(map.values()).map(c=>({
+    nama:c.nama, transaksi:c.transaksi, kunjungan:c.kunjunganSet.size, jarak:c.jarak,
+    kmPerTransaksi: c.transaksi>0 ? c.jarak/c.transaksi : 0, terakhir:c.terakhir,
+    nilai: c.transaksiBernilai>0 ? c.nilai : null,
+    transaksiBernilai: c.transaksiBernilai,
+    rataNilai: c.transaksiBernilai>0 ? c.nilai/c.transaksiBernilai : null
+  })).filter(c=>c.transaksi>0);
+}
+
+function periodeSebelumnya(dari, sampai){
+  const d1=new Date(dari+'T00:00:00'), d2=new Date(sampai+'T00:00:00');
+  const panjangHari = Math.max(1, Math.round((d2-d1)/86400000)+1);
+  const prevSampai = new Date(d1); prevSampai.setDate(prevSampai.getDate()-1);
+  const prevDari = new Date(prevSampai); prevDari.setDate(prevDari.getDate()-(panjangHari-1));
+  const iso = d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  return {dari:iso(prevDari), sampai:iso(prevSampai)};
+}
+
+function getCafeRange(){
+  const now = new Date();
+  if(cafeReportPreset==='month'){
+    return {dari:`${now.getFullYear()}-${pad(now.getMonth()+1)}-01`, sampai:todayISO()};
+  }
+  if(cafeReportPreset==='lastmonth'){
+    const y = now.getMonth()===0 ? now.getFullYear()-1 : now.getFullYear();
+    const m = now.getMonth()===0 ? 12 : now.getMonth();
+    const lastDay = new Date(y, m, 0).getDate();
+    return {dari:`${y}-${pad(m)}-01`, sampai:`${y}-${pad(m)}-${pad(lastDay)}`};
+  }
+  return {
+    dari: document.getElementById('cafeDari').value || todayISO(),
+    sampai: document.getElementById('cafeSampai').value || todayISO()
+  };
+}
+
+const NAMA_BULAN_PENDEK = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+
+function renderLaporanCafe(){
+  let {dari, sampai} = getCafeRange();
+  if(dari > sampai){ const tmp=dari; dari=sampai; sampai=tmp; }
+  const prev = periodeSebelumnya(dari, sampai);
+  const rows = hitungPerCafe(dari, sampai);
+  const prevMap = new Map(hitungPerCafe(prev.dari, prev.sampai).map(c=>[normalisasiNama(c.nama), c]));
+  const cur = hitungNilaiPeriode(dari, sampai);
+  const prevN = hitungNilaiPeriode(prev.dari, prev.sampai);
+
+  document.getElementById('cafeReportPeriodLabel').textContent =
+    `Periode ${fmtTglShort(dari)}–${fmtTglShort(sampai)}, dibandingkan ${fmtTglShort(prev.dari)}–${fmtTglShort(prev.sampai)}`;
+
+  isiPilihanCafePos(rows);
+
+  const adaData = rows.length>0;
+  document.getElementById('cafeReportEmpty').style.display = adaData ? 'none' : 'flex';
+  document.getElementById('rpBody').style.display = adaData ? '' : 'none';
+  if(!adaData){
+    document.getElementById('cafeTableBody').innerHTML = '';
+    document.getElementById('trendChart').innerHTML = '';
+    document.getElementById('trendEmpty').textContent = '';
+    return;
+  }
+
+  // 1. Angka kunci periode
+  const totalTransaksi = rows.reduce((s,c)=>s+c.transaksi,0);
+  document.getElementById('kpiTransaksi').textContent = String(totalTransaksi);
+  document.getElementById('kpiTransaksiSub').textContent = `${rows.length} tujuan · ${cur.trip} trip`;
+
+  document.getElementById('kpiNilai').textContent = cur.tripBernilai ? fmtRp(cur.total) : '-';
+  const bandingEl = document.getElementById('kpiNilaiBanding');
+  if(!cur.tripBernilai){
+    bandingEl.textContent = 'Belum ada nilai transaksi di periode ini.';
+  } else if(!prevN.tripBernilai){
+    bandingEl.textContent = 'Periode lalu belum punya nilai, jadi belum bisa dibandingkan.';
+  } else {
+    bandingEl.innerHTML = `vs periode lalu: ${bandingHtml(cur.total, prevN.total)}`;
+  }
+
+  document.getElementById('kpiRata').textContent = cur.rata!==null ? fmtRp(cur.rata) : '-';
+  document.getElementById('kpiRataSub').textContent =
+    cur.tripBernilai ? `dari ${cur.tripBernilai} trip bernilai` : 'Belum ada trip bernilai';
+
+  const pctLengkap = cur.trip ? Math.round(cur.tripBernilai/cur.trip*100) : 0;
+  document.getElementById('kpiLengkap').textContent = cur.trip ? `${pctLengkap}%` : '-';
+  document.getElementById('kpiLengkapBar').style.width = pctLengkap + '%';
+  document.getElementById('kpiLengkapSub').textContent = `${cur.tripBernilai} dari ${cur.trip} trip sudah bernilai`;
+
+  const belumNilai = cur.trip - cur.tripBernilai;
+  document.getElementById('nilaiKeteranganPeriode').textContent =
+    `Trip bernilai: ${cur.tripBernilai} dari ${cur.trip}.` +
+    (belumNilai > 0 ? ` ${belumNilai} trip belum memiliki nilai transaksi (tidak dihitung sebagai Rp 0).` : ' Semua trip sudah memiliki nilai transaksi.');
+
+  // 2. Data per cafe: hanya cafe yang punya nilai yang masuk ranking, total nilai & rata-rata
+  const ada = rows.filter(c=>c.nilai!==null);
+  const totalCafeNilai = ada.reduce((s,c)=>s+c.nilai,0);
+  const urutNilai = ada.slice().sort((a,b)=>b.nilai-a.nilai);
+  const rankMap = new Map(urutNilai.map((c,i)=>[normalisasiNama(c.nama), i+1]));
+  const maxNilai = urutNilai.length ? urutNilai[0].nilai : 0;
+
+  const data = rows.map(c=>{
+    const p = prevMap.get(normalisasiNama(c.nama)) || null;
+    let tren = {tipe:'baru'};
+    if(p){
+      const pct = Math.round((c.transaksi-p.transaksi)/p.transaksi*100);
+      tren = {tipe: pct>0?'naik':(pct<0?'turun':'tetap'), pct};
+    }
+    let trenNilai = null; // null = belum bisa dibandingkan (salah satu periode belum punya nilai)
+    if(c.nilai!==null && p && p.nilai!==null && p.nilai>0){
+      const pct = Math.round((c.nilai-p.nilai)/p.nilai*100);
+      trenNilai = {tipe: pct>0?'naik':(pct<0?'turun':'tetap'), pct};
+    }
+    const hariLalu = c.terakhir ? Math.floor((new Date(todayISO())-new Date(c.terakhir))/86400000) : null;
+    return {...c, tren, trenNilai, hariLalu, rank: rankMap.get(normalisasiNama(c.nama)) || null};
+  });
+
+  // 3. Sorotan otomatis (teks singkat, dihitung dari data periode ini)
+  const sorotan = [];
+  if(!cur.tripBernilai){
+    sorotan.push(`${svgIcon('alert')}<span>Belum ada nilai transaksi di periode ini. Isi kolom <b>Nilai transaksi (Rp)</b> saat menambah trip, maka analisisnya akan muncul di sini.</span>`);
+  } else {
+    const top = urutNilai[0];
+    sorotan.push(`${svgIcon('trend-up')}<span>Kontributor nilai terbesar: <b>${escapeHtml(top.nama)}</b>, ${fmtRp(top.nilai)} atau ${persen(top.nilai,totalCafeNilai)}% dari total nilai.</span>`);
+    const rataTertinggi = ada.slice().sort((a,b)=>b.rataNilai-a.rataNilai)[0];
+    sorotan.push(`${svgIcon('box')}<span>Rata-rata per transaksi tertinggi: <b>${escapeHtml(rataTertinggi.nama)}</b>, ${fmtRp(Math.round(rataTertinggi.rataNilai))} per transaksi.</span>`);
+    if(urutNilai.length>=4){
+      const tigaTeratas = urutNilai.slice(0,3).reduce((s,c)=>s+c.nilai,0);
+      sorotan.push(`${svgIcon('chart')}<span>Tiga cafe teratas menyumbang <b>${persen(tigaTeratas,totalCafeNilai)}%</b> dari total nilai.</span>`);
+    }
+  }
+  const urutTrx = rows.slice().sort((a,b)=>b.transaksi-a.transaksi);
+  sorotan.push(`${svgIcon('calendar')}<span>Paling sering order: <b>${escapeHtml(urutTrx[0].nama)}</b>, ${urutTrx[0].transaksi} transaksi.</span>`);
+  if(rows.length>1){
+    const terjarang = urutTrx[urutTrx.length-1];
+    sorotan.push(`${svgIcon('trend-down')}<span>Paling jarang order: <b>${escapeHtml(terjarang.nama)}</b>, ${terjarang.transaksi} transaksi.</span>`);
+  }
+  document.getElementById('rpInsights').innerHTML = sorotan.map(x=>`<li>${x}</li>`).join('');
+
+  // 4. Tabel gabungan per cafe (urutan mengikuti kolom yang diklik; nilai kosong selalu di bawah)
+  const sorted = data.slice().sort((a,b)=>{
+    if(cafeSortKey==='nama') return cafeSortDir * String(a.nama).localeCompare(String(b.nama));
+    const va = a[cafeSortKey], vb = b[cafeSortKey];
+    const kosongA = va===null || va===undefined, kosongB = vb===null || vb===undefined;
+    if(kosongA || kosongB) return kosongA===kosongB ? 0 : (kosongA ? 1 : -1);
+    return cafeSortDir * (va - vb);
+  });
+  document.getElementById('cafeTableBody').innerHTML = sorted.map(r=>{
+    const sepi = r.hariLalu!==null && r.hariLalu>=AMBANG_CAFE_SEPI_HARI;
+    const rankHtml = r.rank ? `<span class="rank-no">#${r.rank}</span> ` : '';
+    const lebar = (r.nilai!==null && maxNilai>0) ? Math.round(r.nilai/maxNilai*100) : 0;
+    const nilaiHtml = r.nilai===null
+      ? `<span class="hint-text rp-sub">belum ada nilai</span>`
+      : `${fmtRp(r.nilai)}<div class="nilai-bar-wrap"><div class="nilai-bar" style="width:${lebar}%"></div></div><div class="hint-text rp-sub">${persen(r.nilai,totalCafeNilai)}% dari total</div>`;
+    const rataHtml = r.rataNilai===null
+      ? '-'
+      : `${fmtRp(Math.round(r.rataNilai))}<div class="hint-text rp-sub">dari ${r.transaksiBernilai} transaksi</div>`;
+    return `<tr>
+      <td class="c-nama">${rankHtml}<button type="button" class="cafe-name-link" data-nama="${escapeHtml(r.nama)}">${escapeHtml(r.nama)}</button>${sepi?` <span class="badge badge-warning">${r.hariLalu}h sepi</span>`:''}<div class="hint-text rp-sub">${r.kunjungan} kunjungan</div></td>
+      <td class="num num-mono c-trx" data-label="Transaksi">${r.transaksi}</td>
+      <td class="num num-mono c-nilai" data-label="Nilai (Rp)">${nilaiHtml}</td>
+      <td class="num num-mono c-rata" data-label="Rata-rata / transaksi">${rataHtml}</td>
+      <td class="num c-tren" data-label="Tren vs periode lalu"><div class="rp-tren">${trenBadgeHtml(r.tren)}<span class="rp-sub">trx</span></div><div class="rp-tren">${trenBadgeHtml(r.trenNilai)}<span class="rp-sub">nilai</span></div></td>
+    </tr>`;
+  }).join('');
+  document.querySelectorAll('#cafeTableBody .cafe-name-link').forEach(el=>{
+    el.onclick = ()=> bukaKalenderCafe(el.dataset.nama);
+  });
+  const tanpaNilai = rows.length - ada.length;
+  document.getElementById('nilaiTidakAdaNote').textContent = (ada.length && tanpaNilai>0)
+    ? `${tanpaNilai} tujuan belum punya nilai transaksi di periode ini, jadi tidak masuk ranking dan rata-rata.` : '';
+
+  // 5. Grafik tren nilai per bulan (bulan pembanding sebelum periode ditampilkan pudar)
+  const tampil = daftarBulan(dari, sampai);
+  const bulanIni = todayISO().slice(0,7);
+  const seri = hitungBulanan([bulanSebelumnya(tampil[0]), ...tampil]);
+  const maxBulan = Math.max(0, ...seri.map(x=>x.nilai||0));
+  document.getElementById('trendChart').innerHTML = seri.map((c,i)=>{
+    const isPembanding = i===0;
+    const prevC = i>0 ? seri[i-1] : null;
+    const namaBulan = NAMA_BULAN_PENDEK[parseInt(c.bulan.slice(5,7),10)-1];
+    const tinggi = (c.nilai!==null && c.nilai>0 && maxBulan>0) ? Math.max(4, Math.round(c.nilai/maxBulan*100)) : 0;
+    let chg = '<span class="rp-sub">–</span>';
+    if(prevC && c.nilai!==null && prevC.nilai!==null){
+      const selisih = c.nilai - prevC.nilai;
+      if(selisih===0){
+        chg = '<span class="trend-flat">0%</span><span class="rp-sub">±Rp 0</span>';
+      } else {
+        const naik = selisih>0;
+        const pct = prevC.nilai>0 ? `${Math.round(Math.abs(selisih)/prevC.nilai*100)}%` : '';
+        chg = `<span class="${naik?'trend-up':'trend-down'}">${svgIcon(naik?'trend-up':'trend-down')}${pct}</span><span class="rp-sub">${naik?'+':'-'}${fmtRingkas(Math.abs(selisih))}</span>`;
+      }
+    }
+    const tag = isPembanding ? '<span class="mcol-tag">pembanding</span>'
+      : (c.bulan===bulanIni ? '<span class="mcol-tag now">berjalan</span>' : '');
+    const judul = `${namaBulan} ${c.bulan.slice(0,4)}: ${c.nilai===null ? 'belum ada nilai transaksi' : fmtRp(c.nilai)} · ${c.transaksi} transaksi`;
+    return `<div class="mcol${isPembanding?' is-prev':''}" title="${escapeHtml(judul)}">
+      <span class="mcol-val">${c.nilai===null ? '–' : fmtRingkas(c.nilai)}</span>
+      <div class="mcol-track"><div class="mcol-bar${c.nilai===null?' is-empty':''}" style="height:${tinggi}%"></div></div>
+      <span class="mcol-name">${namaBulan}</span>
+      ${tag}
+      <span class="mcol-sub">${c.trip ? `${c.transaksi} trx` : 'tanpa trip'}</span>
+      <span class="mcol-chg">${chg}</span>
+    </div>`;
+  }).join('');
+  const catatanTren = [];
+  if(seri.slice(1).every(x=>x.nilai===null)) catatanTren.push('Belum ada nilai transaksi di bulan-bulan ini.');
+  if(tampil.includes(bulanIni)) catatanTren.push('Bulan berjalan belum lengkap, jadi perbandingannya dengan bulan penuh hanya gambaran kasar.');
+  document.getElementById('trendEmpty').textContent = catatanTren.join(' ');
+}
+
+// Ikon tren + persen untuk tabel (null = belum bisa dibandingkan).
+function trenBadgeHtml(t){
+  if(!t) return '<span class="hint-text rp-sub">–</span>';
+  if(t.tipe==='baru') return '<span class="badge badge-warning">Baru</span>';
+  if(t.tipe==='naik') return `<span class="trend-up">${svgIcon('trend-up')}${t.pct}%</span>`;
+  if(t.tipe==='turun') return `<span class="trend-down">${svgIcon('trend-down')}${Math.abs(t.pct)}%</span>`;
+  return '<span class="trend-flat">0%</span>';
+}
+
+// Pilihan cafe untuk CSV crosscheck POS (daftar dibangun ulang hanya kalau isinya berubah).
+function isiPilihanCafePos(rows){
+  const sel = document.getElementById('posCafeSelect');
+  const namaList = rows.map(c=>c.nama).sort((a,b)=>a.localeCompare(b));
+  const sig = namaList.join('\u0001');
+  if(sel.dataset.sig !== sig){
+    const pilihLama = sel.value;
+    sel.innerHTML = '<option value="">Semua cafe (satu file)</option>' +
+      namaList.map(n=>`<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('');
+    sel.dataset.sig = sig;
+    if(namaList.includes(pilihLama)) sel.value = pilihLama;
+  }
+}
+
+// CSV crosscheck POS: per tanggal & cafe, berisi jumlah transaksi dan nilai (angka polos).
+function unduhPosCafe(){
+  let {dari, sampai} = getCafeRange();
+  if(dari > sampai){ const tmp=dari; dari=sampai; sampai=tmp; }
+  const pilih = document.getElementById('posCafeSelect').value;
+  const keyPilih = pilih ? normalisasiNama(pilih) : null;
+  const map = new Map();
+  tripsAktif().filter(t=> t.tanggal>=dari && t.tanggal<=sampai).forEach(t=>{
+    getRincian(t).list.forEach(r=>{
+      if(!r.nama || !r.jumlah) return;
+      const key = normalisasiNama(r.nama);
+      if(keyPilih && key!==keyPilih) return;
+      const mk = t.tanggal + '|' + key;
+      if(!map.has(mk)) map.set(mk, {tanggal:t.tanggal, nama:r.nama, jumlah:0, nilai:null});
+      const e = map.get(mk);
+      e.jumlah += r.jumlah;
+      if(typeof r.nilai==='number') e.nilai = (e.nilai||0) + r.nilai;
+    });
+  });
+  const rows = Array.from(map.values()).sort((a,b)=> a.tanggal.localeCompare(b.tanggal) || a.nama.localeCompare(b.nama));
+  if(rows.length===0){ showToast('Belum ada data di periode ini'); return; }
+  const header = ['Tanggal','Cafe','Jumlah Transaksi','Nilai Transaksi (Rp)'];
+  const body = rows.map(r=>[r.tanggal, r.nama, r.jumlah, r.nilai===null ? '' : r.nilai]);
+  const csv = [header, ...body].map(row=>row.map(v=>{
+    const s=String(v);
+    return /[",;\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s;
+  }).join(';')).join('\r\n');
+  const slug = pilih ? pilih.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'') : 'semua-cafe';
+  unduhFile(`pos-crosscheck-${slug}-${dari}_${sampai}.csv`, '﻿'+csv, 'text/csv;charset=utf-8;');
+  showToast('CSV crosscheck POS diunduh');
+}
+window.unduhPosCafe = unduhPosCafe;
+
+
+function unduhLaporanCafe(){
+  let {dari, sampai} = getCafeRange();
+  if(dari > sampai){ const tmp=dari; dari=sampai; sampai=tmp; }
+  const prevRange = periodeSebelumnya(dari, sampai);
+  const rows = hitungPerCafe(dari, sampai);
+  if(rows.length===0){ showToast('Belum ada data di periode ini'); return; }
+  const prevMap = new Map(hitungPerCafe(prevRange.dari, prevRange.sampai).map(c=>[normalisasiNama(c.nama), c.transaksi]));
+  const header = ['Cafe','Total Transaksi','Total Kunjungan','Km per Transaksi','Terakhir Order','Transaksi Periode Sebelumnya','Perubahan (%)','Total Nilai Transaksi (Rp)','Transaksi Bernilai','Rata-rata Nilai/Transaksi (Rp)'];
+  const body = rows.slice().sort((a,b)=>b.transaksi-a.transaksi).map(r=>{
+    const prevT = prevMap.has(normalisasiNama(r.nama)) ? prevMap.get(normalisasiNama(r.nama)) : 0;
+    const pct = prevT>0 ? Math.round(((r.transaksi-prevT)/prevT)*100) : '';
+    return [r.nama, r.transaksi, r.kunjungan, fmtKm(r.kmPerTransaksi), r.terakhir||'', prevT, pct,
+      r.nilai===null ? '' : r.nilai, r.transaksiBernilai>0 ? r.transaksiBernilai : '', r.rataNilai===null ? '' : Math.round(r.rataNilai)];
+  });
+  const csv = [header, ...body].map(row=>row.map(v=>{
+    const s=String(v);
+    return /[",;\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s;
+  }).join(';')).join('\r\n');
+  unduhFile(`laporan-cafe-${dari}_${sampai}.csv`, '\uFEFF'+csv, 'text/csv;charset=utf-8;');
+  showToast('Laporan cafe diunduh');
+}
+window.unduhLaporanCafe = unduhLaporanCafe;
+
+document.getElementById('btnTrenInfo').addEventListener('click', function(e){
+  e.stopPropagation();
+  showToast('Tren = perbandingan periode ini vs periode sebelumnya yang sama panjang. Baris pertama: transaksi (trx). Baris kedua: nilai (Rp).');
+});
+
+// ---------- Kalender pemesanan per cafe ----------
+let kalenderCafeNama = null;
+let kalenderCafeBulan = null;
+
+function kumpulkanTanggalCafe(nama){
+  const key = normalisasiNama(nama);
+  const map = new Map();
+  tripsAktif().forEach(t=>{
+    const {list} = getRincian(t);
+    list.forEach(r=>{
+      if(r.nama && normalisasiNama(r.nama)===key && r.jumlah>0){
+        const e = map.get(t.tanggal) || {jumlah:0, nilai:null};
+        e.jumlah += r.jumlah;
+        if(typeof r.nilai==='number') e.nilai = (e.nilai||0) + r.nilai;
+        map.set(t.tanggal, e);
+      }
+    });
+  });
+  return map;
+}
+
+function bukaKalenderCafe(nama){
+  kalenderCafeNama = nama;
+  const map = kumpulkanTanggalCafe(nama);
+  const tanggalList = Array.from(map.keys()).sort();
+  const terakhir = tanggalList.length ? tanggalList[tanggalList.length-1] : null;
+  kalenderCafeBulan = new Date((terakhir || todayISO())+'T00:00:00');
+  kalenderCafeBulan.setDate(1);
+
+  document.getElementById('cafeCalTitle').textContent = nama;
+  const totalTransaksi = Array.from(map.values()).reduce((a,b)=>a+b.jumlah,0);
+  const hariLalu = terakhir ? Math.floor((new Date(todayISO())-new Date(terakhir))/86400000) : null;
+  document.getElementById('cafeCalSummary').innerHTML = totalTransaksi
+    ? `<b class="num-mono">${totalTransaksi}</b> transaksi &middot; <b class="num-mono">${map.size}</b> hari order &middot; terakhir ${fmtTglShort(terakhir)} (${hariLalu===0?'hari ini':hariLalu+'h lalu'})`
+    : 'Belum ada trip tercatat untuk cafe ini.';
+
+  renderKalenderCafeGrid(map);
+  document.getElementById('cafeCalendarModal').classList.add('show');
+}
+
+function renderKalenderCafeGrid(map){
+  const y = kalenderCafeBulan.getFullYear(), m = kalenderCafeBulan.getMonth();
+  const namaBulan = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  document.getElementById('cafeCalMonthLabel').textContent = `${namaBulan[m]} ${y}`;
+
+  // Total nilai cafe di bulan yang sedang dilihat (hanya trip yang sudah bernilai)
+  let nilaiBulan = 0, adaNilaiBulan = false, jmlBulan = 0;
+  map.forEach((v,iso)=>{
+    if(!iso.startsWith(`${y}-${pad(m+1)}-`)) return;
+    jmlBulan += v.jumlah;
+    if(v.nilai!==null){ nilaiBulan += v.nilai; adaNilaiBulan = true; }
+  });
+  document.getElementById('cafeCalNilaiBulan').innerHTML =
+    `Total nilai ${namaBulan[m]}: ${adaNilaiBulan ? `<b class="num-mono">${fmtRp(nilaiBulan)}</b>` : '<b>-</b>'} · ${jmlBulan} transaksi`;
+
+  const firstDow = new Date(y,m,1).getDay();
+  const daysInMonth = new Date(y,m+1,0).getDate();
+  const maxJumlah = Math.max(1, ...Array.from(map.values()).map(v=>v.jumlah));
+
+  let html = '';
+  for(let i=0;i<firstDow;i++) html += `<div class="cal-cell empty"></div>`;
+  for(let d=1; d<=daysInMonth; d++){
+    const iso = `${y}-${pad(m+1)}-${pad(d)}`;
+    const info = map.get(iso);
+    const jml = info ? info.jumlah : 0;
+    const nilaiHari = info ? info.nilai : null;
+    const isToday = iso===todayISO();
+    let tier = 0;
+    if(jml>0){
+      const rasio = jml/maxJumlah;
+      tier = rasio>0.66 ? 3 : rasio>0.33 ? 2 : 1;
+    }
+    html += `<div class="cal-cell${jml>0?' has-order tier-'+tier:''}${isToday?' today':''}" title="${iso}${jml>0?': '+jml+' transaksi'+(nilaiHari!==null?' · '+fmtRp(nilaiHari):''):''}">`+
+      `<span class="cal-daynum">${d}</span>${jml>0?`<span class="cal-count">${jml}</span>`:''}${nilaiHari!==null?`<span class="cal-nilai">${fmtRingkas(nilaiHari)}</span>`:''}</div>`;
+  }
+  document.getElementById('cafeCalGrid').innerHTML = html;
+}
+
+function gantiBulanKalenderCafe(delta){
+  kalenderCafeBulan.setMonth(kalenderCafeBulan.getMonth()+delta);
+  renderKalenderCafeGrid(kumpulkanTanggalCafe(kalenderCafeNama));
+}
+
+function tutupKalenderCafe(){
+  document.getElementById('cafeCalendarModal').classList.remove('show');
+}
+
+document.getElementById('cafeCalendarModal').addEventListener('click', function(e){
+  if(e.target===this) tutupKalenderCafe();
+});
+document.addEventListener('keydown', function(e){
+  if(e.key==='Escape' && document.getElementById('cafeCalendarModal').classList.contains('show')) tutupKalenderCafe();
+});
+
+window.gantiBulanKalenderCafe = gantiBulanKalenderCafe;
+window.tutupKalenderCafe = tutupKalenderCafe;
+
+document.querySelectorAll('.report-presets .chip-btn').forEach(btn=>{
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('.report-presets .chip-btn').forEach(b=>b.classList.remove('active'));
+    this.classList.add('active');
+    cafeReportPreset = this.dataset.preset;
+    const customWrap = document.getElementById('cafeReportCustomRange');
+    customWrap.style.display = cafeReportPreset==='custom' ? 'flex' : 'none';
+    if(cafeReportPreset==='custom' && !document.getElementById('cafeDari').value){
+      const now = new Date();
+      document.getElementById('cafeDari').value = `${now.getFullYear()}-${pad(now.getMonth()+1)}-01`;
+      document.getElementById('cafeSampai').value = todayISO();
+    }
+    renderLaporanCafe();
+  });
+});
+document.getElementById('cafeDari').addEventListener('change', renderLaporanCafe);
+document.getElementById('cafeSampai').addEventListener('change', renderLaporanCafe);
+document.querySelectorAll('#cafeTable thead th[data-sort]').forEach(th=>{
+  th.addEventListener('click', function(){
+    const key = this.dataset.sort;
+    if(cafeSortKey===key){ cafeSortDir *= -1; } else { cafeSortKey=key; cafeSortDir = (key==='nama')?1:-1; }
+    document.querySelectorAll('#cafeTable thead th').forEach(h=>h.classList.remove('sort-asc','sort-desc'));
+    this.classList.add(cafeSortDir===1 ? 'sort-asc' : 'sort-desc');
+    renderLaporanCafe();
+  });
+});
+
+function renderAll(){
+  renderTabel();
+  renderRekap();
+  renderFavList();
+  renderTrash();
+  renderLaporanCafe();
+}
+
+// ---------- Backup / Restore ----------
+function unduhFile(filename, content, mime){
+  const blob = new Blob([content], {type:mime});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download=filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function unduhJSON(){
+  const data = {version:4, exportedAt:new Date().toISOString(), trips, favs};
+  unduhFile(`backup-log-pengantaran-${todayISO()}.json`, JSON.stringify(data,null,2), 'application/json');
+  showToast('Backup diunduh');
+}
+
+function unduhCSV(){
+  const header = ['No','Tanggal','Waktu','Tujuan','Jumlah Transaksi','Jarak Tempuh (km)','Rata-rata/Transaksi (km)','Catatan','Nilai Transaksi (Rp)'];
+  const sorted = tripsAktif().slice().sort((a,b)=>(a.tanggal+a.waktu).localeCompare(b.tanggal+b.waktu));
+  const rows = sorted.map((t,i)=>[
+    i+1, t.tanggal, t.waktu, t.tujuan, t.jumlah,
+    fmtKm(t.jarak), fmtKm(t.jarak/t.jumlah), t.catatan||'', nilaiTripOf(t)===null ? '' : nilaiTripOf(t)
+  ]);
+  const csv = [header, ...rows].map(r=>r.map(v=>{
+    const s=String(v);
+    return /[",;\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s;
+  }).join(';')).join('\r\n');
+  unduhFile(`log-pengantaran-${todayISO()}.csv`, '\uFEFF'+csv, 'text/csv;charset=utf-8;');
+  showToast('CSV diunduh');
+}
+
+async function importJSON(ev){
+  const file = ev.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = async function(){
+    try{
+      const data = JSON.parse(reader.result);
+      if(!Array.isArray(data.trips)) throw new Error('format tidak sesuai');
+
+      let importedTrips = data.trips.map(t=>{
+        // Backup lama (tanpa nilai) tetap bisa diimpor: nilai otomatis null, nilaiTotal dihitung ulang.
+        const rincianTujuan = bersihkanRincian(Array.isArray(t.rincianTujuan) ? t.rincianTujuan : getRincian(t).list);
+        return {
+          tanggal:t.tanggal, waktu:t.waktu, tujuan:t.tujuan, jumlah:t.jumlah,
+          jarak:t.jarak, catatan:t.catatan||'', trashed: !!t.trashed,
+          deletedAt: t.deletedAt || null,
+          rincianTujuan, nilaiTotal: hitungNilaiTotal(rincianTujuan)
+        };
+      });
+      if(Array.isArray(data.trash)){
+        importedTrips = importedTrips.concat(data.trash.map(t=>{
+          const rincianTujuan = bersihkanRincian(Array.isArray(t.rincianTujuan) ? t.rincianTujuan : getRincian(t).list);
+          return {
+            tanggal:t.tanggal, waktu:t.waktu, tujuan:t.tujuan, jumlah:t.jumlah,
+            jarak:t.jarak, catatan:t.catatan||'', trashed:true,
+            deletedAt: t.deletedAt || new Date().toISOString(),
+            rincianTujuan, nilaiTotal: hitungNilaiTotal(rincianTujuan)
+          };
+        }));
+      }
+      const importedFavs = Array.isArray(data.favs) ? data.favs : [];
+
+      const ok = await confirmModal({
+        title:'Impor backup ini?',
+        message:`Impor akan menambahkan ${importedTrips.length} trip dari backup. Trip yang sekarang ada akan dipindah ke Tempat Sampah (masih bisa dipulihkan), dan favorit lama akan diganti dengan favorit dari backup.`,
+        okText:'Impor', danger:true
+      });
+      if(!ok){ ev.target.value=''; return; }
+
+      setBtnBusy(document.getElementById('btnImporBackup'), true, {text:'Mengimpor…'});
+      showToast('Mengimpor…');
+
+      const tripLamaIds = trips.map(t=>t.id);
+      const favLamaIds = favs.map(f=>f.id);
+
+      for(let i=0;i<importedTrips.length;i+=450){
+        const chunk = importedTrips.slice(i,i+450);
+        const addBatch = writeBatch(db);
+        chunk.forEach(t=> addBatch.set(doc(tripsCol()), t) );
+        await addBatch.commit();
+      }
+
+      for(let i=0;i<importedFavs.length;i+=450){
+        const chunk = importedFavs.slice(i,i+450);
+        const addBatch = writeBatch(db);
+        chunk.forEach(f=> addBatch.set(doc(favsCol()), {nama:f.nama, jarak:parseFloat(f.jarak)}) );
+        await addBatch.commit();
+      }
+
+      for(let i=0;i<tripLamaIds.length;i+=450){
+        const chunk = tripLamaIds.slice(i,i+450);
+        const trashBatch = writeBatch(db);
+        chunk.forEach(id=> trashBatch.update(tripDoc(id), {trashed:true, deletedAt:new Date().toISOString()}) );
+        await trashBatch.commit();
+      }
+      for(let i=0;i<favLamaIds.length;i+=450){
+        const chunk = favLamaIds.slice(i,i+450);
+        const delBatch = writeBatch(db);
+        chunk.forEach(id=> delBatch.delete(favDoc(id)) );
+        await delBatch.commit();
+      }
+
+      showToast('Backup berhasil diimpor');
+    }catch(e){
+      console.error(e);
+      showToast('Gagal impor: file bukan backup JSON yang valid, atau koneksi bermasalah. Data lama tetap aman.', 'error');
+    }finally{
+      setBtnBusy(document.getElementById('btnImporBackup'), false);
+      ev.target.value='';
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ---------- Ekspos fungsi yang dipanggil lewat atribut onclick/onchange di HTML ----------
+window.setMode = setMode;
+window.tambahBarisStop = tambahBarisStop;
+window.tambahTrip = tambahTrip;
+window.resetFilter = resetFilter;
+window.tambahFavorit = tambahFavorit;
+window.kosongkanSampah = kosongkanSampah;
+window.unduhJSON = unduhJSON;
+window.unduhCSV = unduhCSV;
+window.importJSON = importJSON;
+window.tutupModalEdit = tutupModalEdit;
+window.simpanEditTrip = simpanEditTrip;
+
+// ---------- Init ----------
+function setDefaultDateTime(){
+  document.getElementById('f-tanggal').value = todayISO();
+  document.getElementById('f-waktu').value = nowHM();
+}
+setDefaultDateTime();
+</script>
+</body>
+</html>
